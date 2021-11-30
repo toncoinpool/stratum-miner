@@ -15,16 +15,15 @@ npm run start
 
 ## Miner binary
 
-Current pow-miner is located inside `bin` folder.
-Binary name can be changed in src/config.ts file.
+Current pow-miner is located inside `bin` folder. Binary name can be changed in `src/config.ts` file.
 
 ## Config
 
 Configurable settings through config/config.json
 
-- `gpus` : { `[gpuId: string]: boolean` }: List of GPU's with their system id's, that can be separately enabled/disabled
-- `serverAddress` - Pool stratum endpoint
-- `wallet` - Your ton mining wallet
+- `gpus`: { `[gpuId: string]: boolean` } - List of GPU's with their system id's, that can be separately enabled/disabled
+- `serverAddress`: `string` - Pool stratum endpoint
+- `wallet`: `string` - Your ton mining wallet
 
 ## Stratum
 
@@ -47,10 +46,10 @@ Client                                Server
 
 ### Supported methods
 
-- [mining.subscribe](#mining-subscribe)
-- [mining.authorize](#mining-authorize)
-- [mining.set_target](#mining-set_target)
-- [mining.submit](#mining-submit)
+- [mining.subscribe](#miningsubscribe)
+- [mining.authorize](#miningauthorize)
+- [mining.set_target](#miningset_target)
+- [mining.submit](#miningsubmit)
 
 ### Errors
 
@@ -147,7 +146,7 @@ With this method a worker can submit solutions for the mining puzzle.
 This method call will only be executed by clients.
 
 #### Request
-expire?.toString() || '', rdata1?.toString() || '', rseed?.toString() || '', ''
+
 ```
 {"id": 4, "method": "mining.submit", "params": ["expired", "rdata", "rseed", null]}\n
 ```
