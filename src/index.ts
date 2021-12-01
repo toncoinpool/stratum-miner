@@ -24,7 +24,10 @@ void (async function main() {
       reconnecting = false
       console.log("connection established")
 
-      await client.subscribe()
+      const result: any = await client.subscribe()
+
+      miners.forEach((miner) => miner.setComplexity(result[1]))
+
       await client.authorize()
     })
     .on("message", (message) => {

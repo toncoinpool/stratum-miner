@@ -86,6 +86,20 @@ This method call will only be executed by clients.
 	   string
 	2. MUST be mining mode which equals one of the following: `solo`, `pps`, `pplns`
 
+#### Response
+
+```
+{ "id": 1, "result": [null, "DEFAULT_SHARE_COMPLEXITY"], "error": null }\n
+```
+
+- [ `id` : `int` ]: request id
+- [ `result` : (`string`, `string`) ]:
+	- MUST be `null` if an error occurred or otherwise
+		1. If the server supports session resumption, then this SHOULD be a unique
+       session id, `null` otherwise
+		2. The pool share complexity which must be used to pass server's difficulty challenge
+- [ `error` : (`int`, `string`, `object`) ]
+
 ### mining.authorize
 
 Before a client can submit solutions to a server it MUST authorize at least one worker.
@@ -133,10 +147,10 @@ This method call will only be executed by the server.
 - [ `id` : `int` ]: request id
 - [ `method` : `string` ]: RPC method name
 - [ `params` : (`string`, `string`, `string`, `string`) ]: list of method parameters
-	1. Current giver's job seed.
-	2. Share complexity.
-	3. Current giver's address.
-	4. Pool wallet address.
+	1. Current giver's job seed
+	2. "expired" parameter which is preffered by server to calculate job result
+	3. Current giver's address
+	4. Pool wallet address
 
 All job parameters must be used in .boc calculation, otherwise they will be rejected by pool.
 

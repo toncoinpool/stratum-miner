@@ -52,6 +52,7 @@ interface Miner {
 class Miner extends EventEmitter {
   public id: number
 
+  private expired = ""
   private complexity = ""
   private giver = ""
   private iterations = "1000000000000000"
@@ -73,9 +74,13 @@ class Miner extends EventEmitter {
     this.ref?.kill()
   }
 
-  setTarget(seed: string, complexity: string, giver: string, wallet: string) {
-    this.seed = seed
+  setComplexity(complexity: string) {
     this.complexity = complexity
+  }
+
+  setTarget(seed: string, expired: string, giver: string, wallet: string) {
+    this.seed = seed
+    this.expired = expired
     this.giver = giver
     this.wallet = wallet
 
@@ -89,6 +94,7 @@ class Miner extends EventEmitter {
         "-vv",
         ...["-g", this.id.toString()],
         ...["-t", "100"],
+        ...["-e", this.expired],
         this.wallet,
         ...[this.seed, this.complexity, this.iterations, this.giver],
         this.solutionPath
