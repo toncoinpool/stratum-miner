@@ -4,10 +4,10 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
+    // "isolatedModules": true,
     "importHelpers": true,
-    "lib": ["ES2020"],
-    "module": "CommonJS",
+    "lib": ["esnext", "dom"],
+    "module": "commonjs",
     "moduleResolution": "node",
     "newLine": "lf",
     "noEmit": true,

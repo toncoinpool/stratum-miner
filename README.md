@@ -22,12 +22,21 @@ Current pow-miner is located inside `bin` folder. Binary name can be changed in 
 Configurable settings through config/config.json
 
 - `gpus`: { `[gpuId: string]: boolean` } - List of GPU's with their system id's, that can be separately enabled/disabled
-- `serverAddress`: `string` - Pool stratum endpoint
+- `pool`: `string` - Pool stratum endpoint
 - `wallet`: `string` - Your ton mining wallet
+- `binary`: `string` - Mining binary from `bin` folder which should be used for solving jobs
 
 ## Stratum
 
 Ton Coin Pool is based on [Stratum protocol](https://github.com/aeternity/protocol/blob/master/STRATUM.md), so any mining software can be used with it.
+
+### Stratum websocket endpoints
+
+Ton Coin Pool supports 3 mining modes: `solo`, `pps`, `pplns`.
+
+- [ `solo`: `wss://solo.toncoinpool.io` ] 0% comission pool, you will recieve rewards right from `giver`. Same as mining directly without any pool's software, but without need of any `lightserver` installed and with fancy online statistics for your rigs :)
+- [ `pps` ]: Under construction
+- [ `pplns` ]: Under construction
 
 ### Protocol flow example
 
@@ -68,14 +77,13 @@ Available error codes, in addition to the codes defined in the [JSON RPC 2.0]() 
 
 ### mining.subscribe
 
-In order to initiate or resume a session with the server, a client needs to
-call the subscribe method.
-This method call will only be executed by clients.
+In order to initiate or resume a session with the server, a client needs to call the subscribe method\
+This method call will only be executed by clients
 
 #### Request:
 
 ```
-{"id": 1, "method": "mining.subscribe", "params": ["ton-pool-client/1.0.0", "solo", null, null]}\n
+{"id": 1, "method": "mining.subscribe", "params": ["ton-pool-client/1.0.0", null, null, null]}\n
 ```
 
 - [ `id` : `int` ]: request id
@@ -84,7 +92,6 @@ This method call will only be executed by clients.
   parameters
 	1. MUST be name and version of mining software in the given format or empty
 	   string
-	2. MUST be mining mode which equals one of the following: `solo`, `pps`, `pplns`
 
 #### Response
 
@@ -96,14 +103,14 @@ This method call will only be executed by clients.
 - [ `result` : (`string`, `string`) ]:
 	- MUST be `null` if an error occurred or otherwise
 		1. If the server supports session resumption, then this SHOULD be a unique
-       session id, `null` otherwise
+		session id, `null` otherwise
 		2. The pool share complexity which must be used to pass server's difficulty challenge
 - [ `error` : (`int`, `string`, `object`) ]
 
 ### mining.authorize
 
-Before a client can submit solutions to a server it MUST authorize at least one worker.
-This method call will only be executed by clients.
+Before a client can submit solutions to a server it MUST authorize at least one worker\
+This method call will only be executed by clients
 
 #### Request
 
@@ -135,13 +142,13 @@ This method call will only be executed by clients.
 ### mining.set_target
 
 The target difficulty for a block can change and a server needs to be able to
-notify clients of that.
-This method call will only be executed by the server.
+notify clients of that\
+This method call will only be executed by the server
 
 #### Request
 
 ```
-{"id": null, "method": "mining.set_target", "params": ["GIVER_SEED", "GIVER_COMPLEXITY", "GIVER_ADDRESS", "WALLET_ADDRESS"]}\n
+{"id": null, "method": "mining.set_target", "params": ["GIVER_SEED", "EXPIRED", "GIVER_ADDRESS", "WALLET_ADDRESS"]}\n
 ```
 
 - [ `id` : `int` ]: request id
@@ -152,12 +159,12 @@ This method call will only be executed by the server.
 	3. Current giver's address
 	4. Pool wallet address
 
-All job parameters must be used in .boc calculation, otherwise they will be rejected by pool.
+All job parameters must be used in .boc calculation, otherwise they will be rejected by pool
 
 ### mining.submit
 
-With this method a worker can submit solutions for the mining puzzle.
-This method call will only be executed by clients.
+With this method a worker can submit solutions for the mining puzzle\
+This method call will only be executed by clients
 
 #### Request
 
@@ -188,16 +195,13 @@ This method call will only be executed by clients.
 	- If submission failed then it MUST contain error object with the
 	  appropriate error id and description
 
-### client.reconnect
+## Websockets keepalive
 
-If a pool operator wants to have their clients reconnect to the same or a
-different host they use this call.
-
-This method call will only be executed by the server.
+Server will periodically `ping` your connection, you must response with `pong` message to prevent being disconnected from server\
+Implementation: [How to detect and close broken connections?](https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
 
 ## TODO
 
-- set share complexity once throug subscribe/notify
 - omit seed from job submit
 - validate miner's wallet on client side
 - user-friendly logs

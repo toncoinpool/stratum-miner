@@ -13,7 +13,7 @@ void (async function main() {
   console.log(`mining using ${miners.length} gpus`)
 
   let reconnecting = false
-  const client = new Client(config.serverAddress, config.wallet, config.version)
+  const client = new Client(config.pool, config.wallet, config.version)
     .on("close", (code, reason) => {
       console.log(`connection closed with ${code} ${reason}`)
 
@@ -26,13 +26,17 @@ void (async function main() {
 
       const result: any = await client.subscribe()
 
+      console.log("connection subscribed")
+
       miners.forEach((miner) => miner.setComplexity(result[1]))
 
       await client.authorize()
+
+      console.log("connection authorized")
     })
     .on("message", (message) => {
       if ("method" in message && message.method === "mining.set_target") {
-        console.log(message)
+        console.log("new job received")
 
         miners.forEach((miner) => miner.setTarget(...message.params))
       }
@@ -50,8 +54,8 @@ void (async function main() {
   miners.forEach((miner) => {
     miner.on("success", (solution) => {
       client.submit(solution).then(
-        () => console.log(`solution submitted`),
-        (error: Error) => console.error(`failed to submit solution: ${error.message}`)
+        () => console.log('share submitted'),
+        (error: Error) => console.error(`failed to submit share: ${error.message}`)
       )
     })
   })

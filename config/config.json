@@ -5,8 +5,11 @@
     "2": false,
     "3": false,
     "4": false,
-    "5": false
+    "5": false,
+    "6": false,
+    "7": false
   },
-  "serverAddress": "wss://toncoinpool.io/miners",
-  "wallet": "MY_WALLET_ADDRESS"
+  "pool": "wss://solo.toncoinpool.io/stratum",
+  "wallet": "EQBd89zkUG7dGpXTSqiIA89kTuUJfjYNCmPrXzHv_Zpax7Rg",
+  "binary": "pow-miner-cuda-ubuntu-20"
 }

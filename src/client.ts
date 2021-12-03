@@ -71,7 +71,7 @@ class Client extends EventEmitter {
   }
 
   subscribe() {
-    return this.request("mining.subscribe", [`ton-pool-client/${this.version}`, 'solo', null, null])
+    return this.request("mining.subscribe", [`ton-pool-client/${this.version}`])
   }
 
   authorize() {
@@ -89,6 +89,7 @@ class Client extends EventEmitter {
     this.ws.removeAllListeners("error")
     this.ws.removeAllListeners("message")
     this.ws.removeAllListeners("open")
+
     setTimeout(() => {
       if (!this.destroyed) {
         this.ws = new WebSocket(this.address, { perMessageDeflate: false })
@@ -133,8 +134,9 @@ class Client extends EventEmitter {
 
   private async request(method: string, params: unknown) {
     const id = this.id++
+
     await new Promise<void>((resolve, reject) =>
-      this.ws.send(JSON.stringify({ event: 'stratum', data: { id, method, params } }), (err) => (err ? reject(err) : resolve()))
+      this.ws.send(JSON.stringify({ id, method, params }), (err) => (err ? reject(err) : resolve()))
     )
 
     return new Promise((resolve, reject) => {
@@ -143,8 +145,6 @@ class Client extends EventEmitter {
         if (message.id !== id) return undefined
 
         this.removeListener("message", onResponse)
-
-        console.log('onResponse', message)
 
         return message.error === null
           ? resolve(message.result)
