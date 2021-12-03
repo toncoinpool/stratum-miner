@@ -1,5 +1,5 @@
-# Ton Coin Pool pow-miner-gpu
-[Ton Coin Pool](https://toncoinpool.io) miner based on official [tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
+# Ton Coin Pool stratum-miner
+[Ton Coin Pool](https://toncoinpool.io) mining client based on official [tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
 
 ## Installation
 
@@ -15,7 +15,7 @@ npm run start
 
 ## Miner binary
 
-Current pow-miner is located inside `bin` folder. Binary name can be changed in `src/config.ts` file.
+Current pow-miner is located inside `bin` folder. Binary name can be changed in `config/config.json` file.
 
 ## Config
 
@@ -26,17 +26,17 @@ Configurable settings through config/config.json
 - `wallet`: `string` - Your ton mining wallet
 - `binary`: `string` - Mining binary from `bin` folder which should be used for solving jobs
 
-## Stratum
-
-Ton Coin Pool is based on [Stratum protocol](https://github.com/aeternity/protocol/blob/master/STRATUM.md), so any mining software can be used with it.
-
-### Stratum websocket endpoints
+## Ton Coin Pool endpoints
 
 Ton Coin Pool supports 3 mining modes: `solo`, `pps`, `pplns`.
 
 - [ `solo`: `wss://solo.toncoinpool.io` ] 0% comission pool, you will recieve rewards right from `giver`. Same as mining directly without any pool's software, but without need of any `lightserver` installed and with fancy online statistics for your rigs :)
 - [ `pps` ]: Under construction
 - [ `pplns` ]: Under construction
+
+## Stratum
+
+Ton Coin Pool is based on [Stratum protocol](https://github.com/aeternity/protocol/blob/master/STRATUM.md), so any mining software can be used with it.
 
 ### Protocol flow example
 
