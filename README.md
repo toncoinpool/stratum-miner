@@ -21,9 +21,10 @@ Current pow-miner is located inside `bin` folder. Binary name can be changed in 
 
 Configurable settings through config/config.json
 
-- `gpus`: { `[gpuId: string]: boolean` } - List of GPU's with their system id's, that can be separately enabled/disabled
+- `gpus`: `string[]` - List of GPU system id's
 - `pool`: `string` - Pool stratum endpoint
 - `wallet`: `string` - Your ton mining wallet
+- `rig`: `string` - Your rig name
 - `binary`: `string` - Mining binary from `bin` folder which should be used for solving jobs
 
 ## Ton Coin Pool endpoints

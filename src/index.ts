@@ -6,14 +6,14 @@ void (async function main() {
   const config = readConfig()
   console.log(`mining for wallet ${config.wallet}`)
 
-  const miners = Object.entries(config.gpus)
-    .filter(([, enabled]) => enabled)
-    .map(([id]) => new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir))
+  const miners = config.gpus.map(id => new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir))
 
   console.log(`mining using ${miners.length} gpus`)
 
+  console.log(`choosen pool is "${config.pool.replace('wss://', '')}"`)
+
   let reconnecting = false
-  const client = new Client(config.pool, config.wallet, config.version)
+  const client = new Client(config.pool, config.wallet, config.rig, config.version)
     .on("close", (code, reason) => {
       console.log(`connection closed with ${code} ${reason}`)
 

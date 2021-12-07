@@ -40,20 +40,22 @@ function heartbeat (this: any, stop = false) {
 }
 
 class Client extends EventEmitter {
-  private address: string
+  private endpoint: string
   private destroyed = false
   private id = 1
   private reconnectInterval = 5000
   private version: string
   private wallet: string
+  private rig: string
   private ws: WebSocket
 
-  constructor(address: string, wallet: string, version: string) {
+  constructor(endpoint: string, wallet: string, rig: string, version: string) {
     super()
-    this.address = address
+    this.endpoint = endpoint
     this.version = version
     this.wallet = wallet
-    this.ws = new WebSocket(this.address, { perMessageDeflate: false })
+    this.rig = rig
+    this.ws = new WebSocket(this.endpoint, { perMessageDeflate: false })
       .on("close", (code, reason) => this.onClose(code, reason))
       .on("error", (error) => this.onError(error))
       .on("message", (data) => this.onMessage(data))
@@ -75,7 +77,7 @@ class Client extends EventEmitter {
   }
 
   authorize() {
-    return this.request("mining.authorize", [this.wallet, process.env.RIG_NAME || ''])
+    return this.request("mining.authorize", [this.wallet, this.rig])
   }
 
   private onClose(code: number, reason: Buffer) {
@@ -92,7 +94,7 @@ class Client extends EventEmitter {
 
     setTimeout(() => {
       if (!this.destroyed) {
-        this.ws = new WebSocket(this.address, { perMessageDeflate: false })
+        this.ws = new WebSocket(this.endpoint, { perMessageDeflate: false })
           .on("close", (code, reason) => this.onClose(code, reason))
           .on("error", (error) => this.onError(error))
           .on("message", (data) => this.onMessage(data))
@@ -134,6 +136,8 @@ class Client extends EventEmitter {
 
   private async request(method: string, params: unknown) {
     const id = this.id++
+
+    console.log({ id, method, params })
 
     await new Promise<void>((resolve, reject) =>
       this.ws.send(JSON.stringify({ id, method, params }), (err) => (err ? reject(err) : resolve()))
