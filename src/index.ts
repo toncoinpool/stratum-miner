@@ -28,15 +28,17 @@ void (async function main() {
       miners.forEach((miner) => miner.start())
       console.log("connection established")
 
-      const result: any = await client.subscribe()
+      // TODO: move subscribe() and authorize() inside the Client
+      try {
+        const result: any = await client.subscribe()
+        console.log("connection subscribed")
+        miners.forEach((miner) => miner.setComplexity(result[1]))
 
-      console.log("connection subscribed")
-
-      miners.forEach((miner) => miner.setComplexity(result[1]))
-
-      await client.authorize()
-
-      console.log("connection authorized")
+        await client.authorize()
+        console.log("connection authorized")
+      } catch (error) {
+        console.log((<Error>error).message)
+      }
     })
     .on("message", (message) => {
       if ("method" in message && message.method === "mining.set_target") {

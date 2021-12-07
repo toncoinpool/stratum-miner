@@ -27,18 +27,6 @@ interface Client {
   once(event: "reconnect", listener: () => void): this
 }
 
-function heartbeat(this: any, stop = false) {
-  clearTimeout(this.pingTimeout)
-
-  if (!stop) {
-    // Delay should be equal to the interval at which your server
-    // sends out pings plus a conservative assumption of the latency.
-    this.pingTimeout = setTimeout(() => {
-      this.terminate()
-    }, 5000 + 1000)
-  }
-}
-
 class Client extends EventEmitter {
   private endpoint: string
   private destroyed = false
@@ -60,7 +48,6 @@ class Client extends EventEmitter {
       .on("error", (error) => this.onError(error))
       .on("message", (data) => this.onMessage(data))
       .on("open", () => this.onOpen())
-      .on("ping", () => this.onPing())
   }
 
   destroy() {
@@ -82,8 +69,6 @@ class Client extends EventEmitter {
 
   private onClose(code: number, reason: Buffer) {
     if (this.destroyed) {
-      heartbeat.bind(this.ws, true)
-
       return this.emit("close", code, reason.toString())
     }
 
@@ -99,7 +84,6 @@ class Client extends EventEmitter {
           .on("error", (error) => this.onError(error))
           .on("message", (data) => this.onMessage(data))
           .on("open", () => this.onOpen())
-          .on("ping", () => this.onPing())
       }
     }, this.reconnectInterval)
 
@@ -127,11 +111,6 @@ class Client extends EventEmitter {
 
   private onOpen() {
     this.emit("open")
-    this.onPing()
-  }
-
-  private onPing() {
-    heartbeat.bind(this.ws)
   }
 
   private async request(method: string, params: unknown) {
@@ -144,11 +123,18 @@ class Client extends EventEmitter {
     )
 
     return new Promise((resolve, reject) => {
+      const onTimeout = () => {
+        this.removeListener("message", onResponse)
+        this.ws.terminate()
+
+        return reject(new Error(`"${method}" error: server did not respond for 5 seconds`))
+      }
       const onResponse = (message: Message) => {
         // Skip other messages with different ids
         if (message.id !== id) return undefined
 
         this.removeListener("message", onResponse)
+        clearTimeout(timeout)
 
         return message.error === null
           ? resolve(message.result)
@@ -156,6 +142,7 @@ class Client extends EventEmitter {
       }
 
       this.on("message", onResponse)
+      const timeout = setTimeout(onTimeout, 5000)
     })
   }
 }

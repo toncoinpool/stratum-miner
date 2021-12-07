@@ -196,11 +196,6 @@ This method call will only be executed by clients
 	- If submission failed then it MUST contain error object with the
 	  appropriate error id and description
 
-## Websockets keepalive
-
-Server will periodically `ping` your connection, you must response with `pong` message to prevent being disconnected from server\
-Implementation: [How to detect and close broken connections?](https://github.com/websockets/ws#how-to-detect-and-close-broken-connections)
-
 ## TODO
 
 - omit seed from job submit
