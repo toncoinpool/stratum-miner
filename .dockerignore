@@ -1,0 +1,12 @@
+# Files
+Dockerfile
+README.md
+.dockerignore
+.gitlab-ci.yml
+.DS_Store
+
+# Directories
+.git
+.gitlab
+node_modules
+dist

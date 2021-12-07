@@ -6,7 +6,6 @@
   "license": "ISC",
   "scripts": {
     "start": "node dist/index.js",
-    "start:gui": "electron .",
     "build": "tsc -p tsconfig.prod.json",
     "build:prod": "npm run clean && npm run build",
     "clean": "rimraf .cache && rimraf coverage && rimraf dist",

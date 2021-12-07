@@ -28,7 +28,7 @@ const updateFromEnv = (config: ConfigJson) => {
   config.pool = MINER_POOL ?? config.pool
   config.wallet = MINER_WALLET ?? config.wallet
   config.rig = MINER_RIG ?? config.rig
-  config.gpus = MINER_GPUS ? MINER_GPUS.replaceAll(' ', '').split(',') : config.gpus
+  config.gpus = MINER_GPUS ? MINER_GPUS.replace(/ /g, '').split(',') : config.gpus
 }
 
 export default function readConfig(): Config {
