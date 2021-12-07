@@ -9,7 +9,7 @@ interface ConfigJson {
   binary: string
 }
 
-interface Config extends ConfigJson {
+export interface Config extends ConfigJson {
   dataDir: string
   minerPath: string
   version: string

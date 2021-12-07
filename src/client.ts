@@ -28,10 +28,13 @@ interface Client {
 }
 
 class Client extends EventEmitter {
+  public closed = false
+
   private endpoint: string
   private destroyed = false
   private id = 1
   private reconnectInterval = 5000
+  private reconnectTimeout: NodeJS.Timeout | undefined
   private version: string
   private wallet: string
   private rig: string
@@ -52,7 +55,14 @@ class Client extends EventEmitter {
 
   destroy() {
     this.destroyed = true
-    this.ws.readyState === WebSocket.OPEN ? this.ws.close(1001, "Going Away") : this.ws.terminate()
+
+    if (this.ws.readyState === WebSocket.CLOSED) {
+      this.closed = true
+      if (this.reconnectTimeout) clearTimeout(this.reconnectTimeout)
+      return void this.emit("close", 1001, "Going Away")
+    }
+
+    return this.ws.readyState === WebSocket.OPEN ? this.ws.close(1001, "Going Away") : this.ws.terminate()
   }
 
   submit(solution: [string, string, string, string]) {
@@ -69,6 +79,7 @@ class Client extends EventEmitter {
 
   private onClose(code: number, reason: Buffer) {
     if (this.destroyed) {
+      this.closed = true
       return this.emit("close", code, reason.toString())
     }
 
@@ -77,7 +88,7 @@ class Client extends EventEmitter {
     this.ws.removeAllListeners("message")
     this.ws.removeAllListeners("open")
 
-    setTimeout(() => {
+    this.reconnectTimeout = setTimeout(() => {
       if (!this.destroyed) {
         this.ws = new WebSocket(this.endpoint, { perMessageDeflate: false })
           .on("close", (code, reason) => this.onClose(code, reason))

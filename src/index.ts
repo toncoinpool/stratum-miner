@@ -1,9 +1,11 @@
 import Client from "./client"
-import readConfig from "./config"
+import { Config } from "./config"
 import Miner from "./miner"
 
-void (async function main() {
-  const config = readConfig()
+let client: Client
+
+const start = (config: Config) => {
+  console.log("starting client...")
   console.log(`mining for wallet ${config.wallet}`)
 
   const miners = config.gpus.map(
@@ -15,7 +17,7 @@ void (async function main() {
   console.log(`choosen pool is "${config.pool.replace("wss://", "")}"`)
 
   let reconnecting = false
-  const client = new Client(config.pool, config.wallet, config.rig, config.version)
+  client = new Client(config.pool, config.wallet, config.rig, config.version)
     .on("close", (code, reason) => {
       console.log(`connection closed with ${code} ${reason}`)
 
@@ -29,6 +31,7 @@ void (async function main() {
       console.log("connection established")
 
       // TODO: move subscribe() and authorize() inside the Client
+      // TODO: do not reconnect when server rejects subscribe or authorize requests
       try {
         const result: any = await client.subscribe()
         console.log("connection subscribed")
@@ -56,7 +59,6 @@ void (async function main() {
     })
 
   console.log("connecting to the server...")
-  await new Promise<void>((resolve) => client.once("open", resolve))
 
   miners.forEach((miner) => {
     miner.on("success", (solution) => {
@@ -66,4 +68,17 @@ void (async function main() {
       )
     })
   })
-})()
+}
+
+const stop = (): Promise<void> => {
+  console.log("stopping client...")
+
+  if (!client || client.closed) {
+    return Promise.resolve()
+  }
+
+  return Promise.all([new Promise((resolve) => client.once("close", resolve)), client.destroy()]).then(() => undefined)
+}
+
+const TonPoolClient = { start, stop }
+export default TonPoolClient
