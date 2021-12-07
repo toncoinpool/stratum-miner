@@ -1,16 +1,18 @@
 import Client from "./client"
-import Miner from "./miner"
 import readConfig from "./config"
+import Miner from "./miner"
 
 void (async function main() {
   const config = readConfig()
   console.log(`mining for wallet ${config.wallet}`)
 
-  const miners = config.gpus.map(id => new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir))
+  const miners = config.gpus.map(
+    (id) => new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir)
+  )
 
   console.log(`mining using ${miners.length} gpus`)
 
-  console.log(`choosen pool is "${config.pool.replace('wss://', '')}"`)
+  console.log(`choosen pool is "${config.pool.replace("wss://", "")}"`)
 
   let reconnecting = false
   const client = new Client(config.pool, config.wallet, config.rig, config.version)
@@ -54,7 +56,7 @@ void (async function main() {
   miners.forEach((miner) => {
     miner.on("success", (solution) => {
       client.submit(solution).then(
-        () => console.log('share submitted'),
+        () => console.log("share submitted"),
         (error: Error) => console.error(`failed to submit share: ${error.message}`)
       )
     })

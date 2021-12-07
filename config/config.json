@@ -1,5 +1,5 @@
 {
-  "gpus": [ "0" ],
+  "gpus": ["0"],
   "pool": "wss://pplns.toncoinpool.io/stratum",
   "wallet": "YOUR_TON_ADDRESS",
   "rig": "default",

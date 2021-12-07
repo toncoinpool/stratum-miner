@@ -27,7 +27,7 @@ interface Client {
   once(event: "reconnect", listener: () => void): this
 }
 
-function heartbeat (this: any, stop = false) {
+function heartbeat(this: any, stop = false) {
   clearTimeout(this.pingTimeout)
 
   if (!stop) {
@@ -68,7 +68,7 @@ class Client extends EventEmitter {
     this.ws.readyState === WebSocket.OPEN ? this.ws.close(1001, "Going Away") : this.ws.terminate()
   }
 
-  submit(solution: [ string, string, string, string ]) {
+  submit(solution: [string, string, string, string]) {
     return this.request("mining.submit", solution)
   }
 

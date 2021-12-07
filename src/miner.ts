@@ -1,8 +1,8 @@
 import { ChildProcess, execFile } from "child_process"
 import EventEmitter from "events"
-import { Cell, BitString } from "ton"
 import { readFileSync } from "fs"
 import { resolve } from "path"
+import { BitString, Cell } from "ton"
 
 interface MinedBody {
   op?: bigint
@@ -19,7 +19,7 @@ const getBitStringSlices = (bits: BitString, slices: number[]): bigint[] => {
 
   let from = 0
 
-  return slices.map(slice => getBitStringSliceBigInt(bits, from, from += slice))
+  return slices.map((slice) => getBitStringSliceBigInt(bits, from, (from += slice)))
 }
 
 const getBitStringSliceBigInt = (bits: BitString, from: number, to: number): bigint => {
@@ -29,10 +29,8 @@ const getBitStringSliceBigInt = (bits: BitString, from: number, to: number): big
 }
 
 const parseMinedBody = (bits: BitString): MinedBody => {
-  const slices = [ 32, 8, 32, 256, 256, 128, 256 ]
-  const [
-      op, flags, expire, whom, rdata1, rseed, rdata2
-  ] = getBitStringSlices(bits, slices)
+  const slices = [32, 8, 32, 256, 256, 128, 256]
+  const [op, flags, expire, whom, rdata1, rseed, rdata2] = getBitStringSlices(bits, slices)
   const parsed: MinedBody = { op, flags, expire, whom, rdata1, rseed, rdata2 }
 
   return parsed
@@ -40,13 +38,13 @@ const parseMinedBody = (bits: BitString): MinedBody => {
 
 interface Miner {
   emit(event: "error", error: Error): boolean
-  emit(event: "success", solution: [ string, string, string, string ]): boolean
+  emit(event: "success", solution: [string, string, string, string]): boolean
 
   on(event: "error", listener: (error: Error) => void): this
-  on(event: "success", listener: (solution: [ string, string, string, string ]) => void): this
+  on(event: "success", listener: (solution: [string, string, string, string]) => void): this
 
   once(event: "error", listener: (error: Error) => void): this
-  once(event: "success", listener: (solution: [ string, string, string, string ]) => void): this
+  once(event: "success", listener: (solution: [string, string, string, string]) => void): this
 }
 
 class Miner extends EventEmitter {
@@ -125,7 +123,7 @@ class Miner extends EventEmitter {
 
           const { expire, rdata1, rseed } = parseMinedBody(body)
 
-          this.emit("success", [ expire?.toString() || '', rdata1?.toString() || '', rseed?.toString() || '', '' ])
+          this.emit("success", [expire?.toString() || "", rdata1?.toString() || "", rseed?.toString() || "", ""])
         } catch (readFileError) {
           this.emit("error", new Error(`[${this.id}] miner failed to read boc file ${this.solutionPath} with error: ${(readFileError as Error).message}`)) // prettier-ignore
         }
