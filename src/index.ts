@@ -19,11 +19,13 @@ void (async function main() {
     .on("close", (code, reason) => {
       console.log(`connection closed with ${code} ${reason}`)
 
-      miners.forEach((miner) => miner.shutdown())
+      miners.forEach((miner) => miner.stop())
     })
     .on("error", ({ message }) => console.error(`connection error: ${message}`))
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     .on("open", async () => {
       reconnecting = false
+      miners.forEach((miner) => miner.start())
       console.log("connection established")
 
       const result: any = await client.subscribe()
@@ -47,6 +49,7 @@ void (async function main() {
       if (!reconnecting) {
         console.log("connection lost, reconnecting...")
         reconnecting = true
+        miners.forEach((miner) => miner.stop())
       }
     })
 

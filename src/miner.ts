@@ -58,6 +58,7 @@ class Miner extends EventEmitter {
   private ref?: ChildProcess = undefined
   private seed = ""
   private solutionPath: string
+  private stopped = false
   private wallet: string
 
   constructor(id: number, wallet: string, minerPath: string, dataDir: string) {
@@ -66,10 +67,6 @@ class Miner extends EventEmitter {
     this.minerPath = minerPath
     this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
     this.wallet = wallet
-  }
-
-  shutdown() {
-    this.ref?.kill()
   }
 
   setComplexity(complexity: string) {
@@ -85,7 +82,12 @@ class Miner extends EventEmitter {
     this.ref ? this.ref.kill() : this.run()
   }
 
-  private run() {
+  private run(): void {
+    // once stopped, calling start() followed by setTarget() will start the mining loop again
+    if (this.stopped) {
+      return undefined
+    }
+
     this.ref = execFile(
       this.minerPath,
       [
@@ -99,6 +101,8 @@ class Miner extends EventEmitter {
       ],
       { timeout: 0 },
       (error, stdout, stderr) => {
+        this.ref = undefined
+
         if (error && error.code && error.code > 1) {
           this.emit("error", new Error(`[${this.id}] miner had unexpected exit code ${error.code} with error: ${error.message.trim()}`)) // prettier-ignore
         }
@@ -131,6 +135,15 @@ class Miner extends EventEmitter {
         return this.run()
       }
     )
+  }
+
+  start() {
+    this.stopped = false
+  }
+
+  stop() {
+    this.stopped = true
+    this.ref?.kill()
   }
 }
 
