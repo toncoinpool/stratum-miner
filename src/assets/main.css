@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'Baloo Bhaijaan 2';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./fonts/BalooBhaijaan2-Regular.ttf');
+  }
+
+  @font-face {
+    font-family: 'Baloo Bhaijaan 2';
+    font-style: bold;
+    font-weight: 700;
+    font-display: swap;
+    src: url('./fonts/BalooBhaijaan2-Bold.ttf');
+  }
+
+* {
+    box-sizing: border-box;
+}
+
+input, button {
+    font-family: 'Baloo Bhaijaan 2', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Baloo Bhaijaan 2', sans-serif;
+    color: #303757;
+}

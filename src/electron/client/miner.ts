@@ -82,6 +82,34 @@ class Miner extends EventEmitter {
     this.ref ? this.ref.kill() : this.run()
   }
 
+  static getDevices (binary: string): Promise<any[]> {
+    const minerPath = resolve(__dirname, "../..", "bin", binary)
+
+    return new Promise((resolve, reject) => {
+      execFile(
+        minerPath,
+        (error, stdout, stderr) => {
+          const re = /^(\[ [^\]]+ \])/gmi
+          const matches = [ ...stderr.matchAll(re) ]
+          const devices = matches
+            .map((el, value) => {
+              const reStart = /^\[ (OpenCL: platform #[0-9]+ device #[0-9]+|GPU #[0-9]+:) /gmi
+              const reEnd =/ \](.*)/gmi
+              const label = el?.[0]?.replace(reStart, '').replace(reEnd, '')
+
+              return { label, value }
+            })
+
+          if (!devices.length) {
+            return reject(stderr)
+          }
+
+          resolve(devices)
+        }
+      )
+    })
+  }
+
   private run(): void {
     // once stopped, calling start() followed by setTarget() will start the mining loop again
     if (this.stopped) {

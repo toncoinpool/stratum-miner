@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/electron"],
+  "exclude": ["**/*.test.ts"],
+  "compilerOptions": {
+    "declaration": true,
+    "incremental": true,
+    "noEmit": false,
+    "outDir": "dist/electron",
+    "rootDir": "src/electron",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": false,
+    "sourceMap": true,
+    "tsBuildInfoFile": ".cache/ts/.tsbuildinfo",
+    "types": ["node"]
+  }
+}

@@ -1,7 +1,7 @@
 import { readFileSync } from "fs"
 import { resolve } from "path"
 
-interface ConfigJson {
+export interface ConfigJson {
   gpus: string[]
   pool: string
   wallet: string
@@ -11,9 +11,14 @@ interface ConfigJson {
 
 export interface Config extends ConfigJson {
   dataDir: string
+  baseBinaryPath: string
   minerPath: string
   version: string
 }
+
+const resourcePath = !process.env.NODE_ENV || process.env.NODE_ENV === "production"
+    ? process.resourcesPath
+    : resolve(__dirname, '..', '..')
 
 const updateFromEnv = (config: ConfigJson) => {
   const { MINER_GPUS, MINER_WALLET, MINER_RIG, MINER_POOL, MINER_BINARY } = process.env
@@ -28,7 +33,7 @@ const updateFromEnv = (config: ConfigJson) => {
 export default function readConfig(): Config {
   let config: ConfigJson
   try {
-    config = JSON.parse(readFileSync(resolve(__dirname, "..", "config", `config.json`), "utf8")) as ConfigJson
+    config = JSON.parse(readFileSync(resolve(resourcePath, "config", `config.json`), "utf8")) as ConfigJson
   } catch (error) {
     throw new Error(`failed to parse config: ${(error as Error).message}`)
   }
@@ -46,9 +51,10 @@ export default function readConfig(): Config {
   if (!config.rig) throw new Error(`"config.rig" field is missing`)
   if (!config.binary) throw new Error(`"config.binary" field is missing`)
 
-  const dataDir = resolve(__dirname, "..", "data")
-  const minerPath = resolve(__dirname, "..", "bin", config.binary)
+  const dataDir = resolve(resourcePath, "data")
+  const baseBinaryPath = resolve(resourcePath, "bin")
+  const minerPath = resolve(baseBinaryPath, config.binary)
   const version = "1.0.0"
 
-  return { ...config, dataDir, minerPath, version }
+  return { ...config, dataDir, baseBinaryPath, minerPath, version }
 }
