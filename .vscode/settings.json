@@ -1,11 +1,11 @@
 {
-  "editor.codeActionsOnSave": ["source.organizeImports", "source.fixAll.eslint"],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "editor.formatOnType": false,
-  "editor.insertSpaces": true,
-  "editor.tabSize": 2,
-  "eslint.probe": ["typescript"],
-  "files.eol": "\n",
-  "typescript.tsdk": "node_modules/typescript/lib"
+    "editor.codeActionsOnSave": ["source.organizeImports", "source.fixAll.eslint"],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "eslint.probe": ["typescript"],
+    "files.eol": "\n",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

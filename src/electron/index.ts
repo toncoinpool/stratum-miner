@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
 import { resolve } from 'path'
+import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron' // eslint-disable-line import/no-extraneous-dependencies
+import TonPoolClient from './client'
 import readConfig, { ConfigJson } from './client/config'
-import TonPoolClient from './client/index'
 import Miner from './client/miner'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -18,7 +18,7 @@ const createWindow = () => {
         }
     })
 
-    mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
+    void mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
 
     if (isDev) {
         mainWindow.webContents.openDevTools()
@@ -47,7 +47,7 @@ app.on('window-all-closed', () => {
     }
 })
 
-ipcMain.on('miningStart', (event: any, config: ConfigJson) => {
+ipcMain.on('miningStart', (event: IpcMainEvent, config: ConfigJson) => {
     baseConfig.minerPath = resolve(baseConfig.baseBinaryPath, config.binary)
 
     TonPoolClient.start(Object.assign(baseConfig, config))
@@ -55,14 +55,14 @@ ipcMain.on('miningStart', (event: any, config: ConfigJson) => {
     event.reply('miningStart', true)
 })
 
-ipcMain.on('miningStop', (event: any) => {
-    TonPoolClient.stop()
+ipcMain.on('miningStop', (event: IpcMainEvent) => {
+    void TonPoolClient.stop()
 
     event.reply('miningStop', true)
 })
 
-
-ipcMain.on('getDevices', async (event: any, binary: string) => {
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+ipcMain.on('getDevices', async (event: IpcMainEvent, binary: string) => {
     const path = resolve(baseConfig.baseBinaryPath, binary)
     const devices = await Miner.getDevices(path)
 

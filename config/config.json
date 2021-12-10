@@ -1,7 +1,7 @@
 {
-  "gpus": ["0"],
-  "pool": "wss://pplns.toncoinpool.io/stratum",
-  "wallet": "YOUR_TON_ADDRESS",
-  "rig": "default",
-  "binary": "pow-miner-cuda-ubuntu-20"
+    "gpus": ["0"],
+    "pool": "wss://pplns.toncoinpool.io/stratum",
+    "wallet": "YOUR_TON_ADDRESS",
+    "rig": "default",
+    "binary": "pow-miner-cuda-ubuntu-20"
 }
