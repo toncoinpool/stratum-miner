@@ -63,8 +63,12 @@ ipcMain.on('miningStop', (event: IpcMainEvent) => {
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 ipcMain.on('getDevices', async (event: IpcMainEvent, binary: string) => {
-    const path = resolve(baseConfig.baseBinaryPath, binary)
-    const devices = await Miner.getDevices(path)
+    try {
+        const path = resolve(baseConfig.baseBinaryPath, binary)
+        const devices = await Miner.getDevices(path)
 
-    event.reply('getDevices', devices)
+        event.reply('getDevices', null, devices)
+    } catch (error) {
+        event.reply('getDevices', error, [])
+    }
 })

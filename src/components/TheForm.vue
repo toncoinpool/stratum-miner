@@ -65,7 +65,6 @@
                 disabled
                 loading
                 @click="onToggleMining"
-                v-text="'Loading GPUs...'"
             />
             <el-button
                 v-else
@@ -76,20 +75,27 @@
                 v-text="'Start mining'"
             />
         </div>
+        <el-dialog
+            v-model="isError"
+            title="Error"
+            fullscreen
+            @closed="clearError"
+        >
+            {{ errorMessage }}
+        </el-dialog>
     </div>
 </template>
 
 <script lang="ts">
     import { defineComponent, ref, computed } from 'vue'
 
-    import { ElButton, ElForm, ElFormItem, ElInput, ElSelect, ElSelectV2, ElOption } from 'element-plus'
+    import { ElButton, ElForm, ElFormItem, ElInput, ElSelectV2, ElDialog } from 'element-plus'
     import 'element-plus/es/components/button/style/css'
     import 'element-plus/es/components/form/style/css'
     import 'element-plus/es/components/form-item/style/css'
     import 'element-plus/es/components/input/style/css'
-    import 'element-plus/es/components/select/style/css'
     import 'element-plus/es/components/select-v2/style/css'
-    import 'element-plus/es/components/option/style/css'
+    import 'element-plus/es/components/dialog/style/css'
 
     interface MiningConfig {
         gpus: string[]
@@ -106,9 +112,8 @@
             ElForm,
             ElFormItem,
             ElInput,
-            ElSelect,
             ElSelectV2,
-            ElOption
+            ElDialog
         },
         setup () {
             const pools = ref([
@@ -132,6 +137,8 @@
 
             const isMiningStarted = ref(false)
             const isLoadingGpus = ref(false)
+            const isError = ref(false)
+            const errorMessage = ref('')
 
             const fieldsCompleted = computed(() =>
                 pool.value
@@ -174,16 +181,31 @@
                 window.ipcRenderer.send('getDevices', binary)
             }
 
+            const clearError = () => {
+                isError.value = false
+                errorMessage.value = ''
+            }
+
             window.ipcRenderer.on('miningStart', () => { isMiningStarted.value = true })
             window.ipcRenderer.on('miningStop', () => { isMiningStarted.value = false })
-            window.ipcRenderer.on('getDevices', (_event: any, data: any) => {
-                devices.value = data
+            window.ipcRenderer.on('getDevices', (_event: any, error: any, data: string[]) => {
                 isLoadingGpus.value = false
+
+                if (error !== null) {
+                    isError.value = true
+                    errorMessage.value = error
+
+                    return undefined
+                }
+
+                devices.value = data.map((el, i) => ({ label: el, value: i }))
             })
 
             return {
                 isLoadingGpus,
                 isMiningStarted,
+                isError,
+                errorMessage,
                 fieldsCompleted,
                 pools,
                 binaries,
@@ -194,7 +216,8 @@
                 wallet,
                 rig,
                 onToggleMining,
-                getDevices
+                getDevices,
+                clearError
             }
         }
     })

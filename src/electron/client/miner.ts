@@ -82,20 +82,22 @@ class Miner extends EventEmitter {
         this.ref ? this.ref.kill() : this.run()
     }
 
-    static getDevices(binary: string): Promise<any[]> {
+    static getDevices(binary: string): Promise<string[]> {
         const minerPath = resolve(__dirname, '../..', 'bin', binary)
 
         return new Promise((resolve, reject) => {
             execFile(minerPath, (error, stdout, stderr) => {
                 const re = /^(\[ [^\]]+ \])/gim
                 const matches = [...stderr.matchAll(re)]
-                const devices = matches.map((el, value) => {
-                    const reStart = /^\[ (OpenCL: platform #[0-9]+ device #[0-9]+|GPU #[0-9]+:) /gim
-                    const reEnd = / \](.*)/gim
-                    const label = el?.[0]?.replace(reStart, '').replace(reEnd, '')
+                const devices = matches
+                    .map((el) => {
+                        const reStart = /^\[ (OpenCL: platform #[0-9]+ device #[0-9]+|GPU #[0-9]+:) /gim
+                        const reEnd = / \](.*)/gim
+                        const device = el?.[0]?.replace(reStart, '').replace(reEnd, '')
 
-                    return { label, value }
-                })
+                        return device
+                    })
+                    .filter((el): el is string => el !== undefined)
 
                 if (!devices.length) {
                     return reject(stderr)
