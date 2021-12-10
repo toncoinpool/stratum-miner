@@ -36,6 +36,14 @@ const parseMinedBody = (bits: BitString): MinedBody => {
     return parsed
 }
 
+export interface Benchmark extends EventEmitter {
+    on(event: 'done', listener: (error: Error | null, result?: [number, number]) => void): this
+    on(event: 'progress', listener: (progress: number) => void): this
+
+    once(event: 'done', listener: (error: Error | null, result?: [number, number]) => void): this
+    once(event: 'progress', listener: (progress: number) => void): this
+}
+
 interface Miner {
     emit(event: 'error', error: Error): boolean
     emit(event: 'success', solution: [string, string, string, string]): boolean
@@ -67,6 +75,53 @@ class Miner extends EventEmitter {
         this.minerPath = minerPath
         this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
         this.wallet = wallet
+    }
+
+    // TODO: add prototype method for stopping the benchmark
+    static benchmark(bin: string, id: number, timeout = 10): Benchmark {
+        const events: Benchmark = new EventEmitter()
+        const child = execFile(
+            resolve(__dirname, '..', '..', 'bin', bin),
+            [
+                ...['-vv', '-g', id.toString(10), '-B', '-t', timeout.toString(10)],
+                'kQBWkNKqzCAwA9vjMwRmg7aY75Rf8lByPA9zKXoqGkHi8SM7',
+                '229760179690128740373110445116482216837',
+                '5391989333430127958933403017403926134727428884508114496220722049840',
+                '10000000000000000000'
+            ],
+            (error, stdout, stderr) => {
+                if (error) {
+                    const lines = error.message.trim().split('\n')
+                    // remove colors and leading log tags
+                    const rawLine = (lines[lines.length - 1] || 'unknown error')
+                        .replace('\u001b[1;36m', '')
+                        .replace('\u001b[1;31m', '')
+                        .replace('\u001b[0m', '')
+                        .replace(/^\[[^\]]+\]\[[^\]]+\]\[[^\]]+\]/, '')
+
+                    return events.emit('done', new Error(rawLine))
+                }
+
+                const [, boost = '16'] = stderr.match(/best boost factor: +(\d+)/) || []
+                const [, hashrate = '0'] = stderr.match(/best speed: +(\d+)/) || []
+
+                return events.emit('done', null, [Number.parseInt(boost, 10), Number.parseInt(hashrate, 10)])
+            }
+        )
+
+        if (child.stderr) {
+            const step = /cuda/.test(bin) ? 6 : 9
+            let attempt = 0
+
+            child.stderr.on('data', (line: string) => {
+                if (/START MINER/.test(line)) {
+                    // progress is approximate and can slow down towards the end
+                    events.emit('progress', step * attempt++)
+                }
+            })
+        }
+
+        return events
     }
 
     setComplexity(complexity: string) {
