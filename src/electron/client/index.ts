@@ -2,6 +2,7 @@
 import EventEmitter from 'events'
 import Client from './client'
 import { Config } from './config'
+import log from './logger'
 import Miner from './miner'
 
 interface TonPoolClient {
@@ -38,11 +39,11 @@ class TonPoolClient extends EventEmitter {
     }
 
     start(config: Config): void {
-        console.log('starting client...')
-        console.log(`mining for wallet ${config.wallet}`)
+        log.info('starting client...')
+        log.info(`mining for wallet ${config.wallet}`)
 
         const onError = (error: Error) => {
-            console.log(error.message)
+            log.error(error)
             this.emit('error', error)
         }
 
@@ -53,14 +54,14 @@ class TonPoolClient extends EventEmitter {
             )
         )
 
-        console.log(`mining using ${miners.length} gpus`)
+        log.info(`mining using ${miners.length} gpus`)
 
-        console.log(`choosen pool is "${config.pool.replace('wss://', '')}"`)
+        log.info(`choosen pool is "${config.pool.replace('wss://', '')}"`)
 
         let reconnecting = false
         this.client = new Client(config.pool, config.wallet, config.rig, config.version)
             .on('close', (code, reason) => {
-                console.log(`connection closed with ${code} ${reason}`)
+                log.info(`connection closed with ${code} ${reason}`)
 
                 this.state = this.DISCONNECTED
                 this.emit('stop')
@@ -72,17 +73,17 @@ class TonPoolClient extends EventEmitter {
             .on('open', async () => {
                 reconnecting = false
                 miners.forEach((miner) => miner.start())
-                console.log('connection established')
+                log.info('connection established')
 
                 // TODO: move subscribe() and authorize() inside the Client
                 // TODO: do not reconnect when server rejects subscribe or authorize requests
                 try {
                     const result = await this.client!.subscribe()
-                    console.log('connection subscribed')
+                    log.info('connection subscribed')
                     miners.forEach((miner) => miner.setComplexity(result[1]))
 
                     await this.client!.authorize()
-                    console.log('connection authorized')
+                    log.info('connection authorized')
 
                     this.state = this.CONNECTED
                     this.emit('connect')
@@ -92,7 +93,7 @@ class TonPoolClient extends EventEmitter {
             })
             .on('message', (message) => {
                 if ('method' in message && message.method === 'mining.set_target') {
-                    console.log('new job received')
+                    log.info('new job received')
 
                     this.state = this.MINING
 
@@ -101,7 +102,7 @@ class TonPoolClient extends EventEmitter {
             })
             .on('reconnect', () => {
                 if (!reconnecting) {
-                    console.log('connection lost, reconnecting...')
+                    log.warn('connection lost, reconnecting...')
 
                     reconnecting = true
                     this.state = this.RECONNECTING
@@ -111,7 +112,7 @@ class TonPoolClient extends EventEmitter {
                 }
             })
 
-        console.log('connecting to the server...')
+        log.info('connecting to the server...')
 
         this.state = this.CONNECTING
 
@@ -119,7 +120,7 @@ class TonPoolClient extends EventEmitter {
             miner.on('success', (solution) => {
                 this.client!.submit(solution).then(
                     () => {
-                        console.log('share submitted')
+                        log.info('share submitted')
                         this.emit('submit')
                     },
                     ({ message }: Error) => onError(new Error(`miner error: failed to submit share: ${message}`))
@@ -129,7 +130,7 @@ class TonPoolClient extends EventEmitter {
     }
 
     stop(): Promise<void> {
-        console.log('stopping client...')
+        log.info('stopping client...')
 
         if (!this.client || this.client.closed) {
             return Promise.resolve()

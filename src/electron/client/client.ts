@@ -1,5 +1,6 @@
 import EventEmitter from 'events'
 import WebSocket, { RawData } from 'ws'
+import log from './logger'
 
 type ServerRequest = { id: null; method: 'mining.set_target'; params: [string, string, string, string] }
 type ServerReply =
@@ -127,7 +128,7 @@ class Client extends EventEmitter {
     private async request(method: string, params: unknown) {
         const id = this.id++
 
-        console.log({ id, method, params })
+        log.info('%O', { id, method, params })
 
         await new Promise<void>((resolve, reject) =>
             this.ws.send(JSON.stringify({ id, method, params }), (err) => (err ? reject(err) : resolve()))
