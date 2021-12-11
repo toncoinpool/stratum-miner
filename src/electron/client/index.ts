@@ -8,12 +8,14 @@ import Miner from './miner'
 interface TonPoolClient {
     on(event: 'connect', listener: () => void): this
     on(event: 'error', listener: (error: Error) => void): this
+    on(event: 'hashrate', listener: (gpuId: string, hashrate: bigint) => void): this
     on(event: 'reconnect', listener: () => void): this
     on(event: 'stop', listener: () => void): this
     on(event: 'submit', listener: () => void): this
 
     once(event: 'connect', listener: () => void): this
     once(event: 'error', listener: (error: Error) => void): this
+    once(event: 'hashrate', listener: (gpuId: string, hashrate: bigint) => void): this
     once(event: 'reconnect', listener: () => void): this
     once(event: 'stop', listener: () => void): this
     once(event: 'submit', listener: () => void): this
@@ -48,10 +50,9 @@ class TonPoolClient extends EventEmitter {
         }
 
         const miners = config.gpus.map((id) =>
-            new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir).on(
-                'error',
-                ({ message }) => onError(new Error(`miner error: ${message}`))
-            )
+            new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir)
+                .on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
+                .on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
         )
 
         log.info(`mining using ${miners.length} gpus`)
