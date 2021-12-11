@@ -12,6 +12,9 @@ interface TonPoolClient {
     on(event: 'reconnect', listener: () => void): this
     on(event: 'stop', listener: () => void): this
     on(event: 'submit', listener: () => void): this
+    on(event: 'submitDuplicate', listener: () => void): this
+    on(event: 'submitInvalid', listener: () => void): this
+    on(event: 'submitStale', listener: () => void): this
 
     once(event: 'connect', listener: () => void): this
     once(event: 'error', listener: (error: Error) => void): this
@@ -19,6 +22,9 @@ interface TonPoolClient {
     once(event: 'reconnect', listener: () => void): this
     once(event: 'stop', listener: () => void): this
     once(event: 'submit', listener: () => void): this
+    once(event: 'submitDuplicate', listener: () => void): this
+    once(event: 'submitInvalid', listener: () => void): this
+    once(event: 'submitStale', listener: () => void): this
 }
 
 class TonPoolClient extends EventEmitter {
@@ -124,7 +130,23 @@ class TonPoolClient extends EventEmitter {
                         log.info('share submitted')
                         this.emit('submit')
                     },
-                    ({ message }: Error) => onError(new Error(`miner error: failed to submit share: ${message}`))
+                    ({ message }: Error) => {
+                        onError(new Error(`miner error: failed to submit share: ${message}`))
+
+                        if (/21 Job not found/.test(message)) {
+                            return this.emit('submitStale')
+                        }
+
+                        if (/22 Duplicate share/.test(message)) {
+                            return this.emit('submitDuplicate')
+                        }
+
+                        if (/23 Low difficulty share/.test(message)) {
+                            return this.emit('submitInvalid')
+                        }
+
+                        return undefined
+                    }
                 )
             })
         })
