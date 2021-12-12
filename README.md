@@ -1,31 +1,33 @@
 # Ton Coin Pool stratum-miner
 [Ton Coin Pool](https://toncoinpool.io) mining client based on official [tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
 
-## Installation
-
-```
-npm i && npm run build:prod
-```
-
 ## Usage
 
+```shell
+$ ./ton-pool-client --wallet <your-wallet-address> [--bin <name>] [--gpus <ids>] [--headless] [--pool <uri>] [--rig <name>]
 ```
-npm run start
-```
 
-## Miner binary
+- `-w, --wallet`: *Required*. Your TON wallet's address
+- `-b, --bin <name>`: Name of the miner binary. Can be one of:
 
-Current pow-miner is located inside `bin` folder. Binary name can be changed in `config/config.json` file.
+  Linux:
 
-## Config
+  - `pow-miner-cuda-ubuntu-18`
+  - `pow-miner-cuda-ubuntu-20`
+  - `pow-miner-opencl-ubuntu-18`
+  - `pow-miner-opencl-ubuntu-20`
 
-Configurable settings through config/config.json
+  Windows:
 
-- `gpus`: `string[]` - List of GPU system id's
-- `pool`: `string` - Pool stratum endpoint
-- `wallet`: `string` - Your ton mining wallet
-- `rig`: `string` - Your rig name
-- `binary`: `string` - Mining binary from `bin` folder which should be used for solving jobs
+  - `pow-miner-cuda.exe`
+  - `pow-miner-opencl.exe`
+
+  Defaults to `pow-miner-cuda-ubuntu-20`
+- `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`. Only
+necessary on multi-GPU systems. Example: `--gpus 0,3,4`
+- `-h, --headless`: Pass this flag to not open the client's GUI window
+- `-p, --pool`: Pool address to connect to. Defaults to `wss://pplns.toncoinpool.io/stratum`
+- `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to `default`
 
 ## Ton Coin Pool endpoints
 
