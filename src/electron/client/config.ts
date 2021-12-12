@@ -1,8 +1,10 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import commandLineArgs from 'command-line-args'
 
 export interface ConfigJson {
     gpus: string[]
+    headless: boolean
     pool: string
     wallet: string
     rig: string
@@ -31,6 +33,34 @@ const updateFromEnv = (config: ConfigJson) => {
     config.gpus = MINER_GPUS ? MINER_GPUS.replace(/ /g, '').split(',') : config.gpus
 }
 
+const updateFromCli = (config: ConfigJson) => {
+    const args = commandLineArgs([
+        { name: 'bin', alias: 'b', defaultValue: config.binary },
+        {
+            name: 'gpus',
+            alias: 'g',
+            type(gpus) {
+                return gpus
+                    .split(',')
+                    .map((gpu) => gpu.trim())
+                    .filter(Boolean)
+            },
+            defaultValue: config.gpus
+        },
+        { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
+        { name: 'pool', alias: 'p', defaultValue: config.pool },
+        { name: 'rig', alias: 'r', defaultValue: config.rig },
+        { name: 'wallet', alias: 'w', defaultValue: config.wallet }
+    ])
+
+    config.binary = args.bin as string
+    config.gpus = args.gpus as string[]
+    config.headless = args.headless as boolean
+    config.pool = args.pool as string
+    config.rig = args.rig as string
+    config.wallet = args.wallet as string
+}
+
 export default function readConfig(): Config {
     let config: ConfigJson
     try {
@@ -40,6 +70,7 @@ export default function readConfig(): Config {
     }
 
     updateFromEnv(config)
+    updateFromCli(config)
 
     if (!config.gpus) throw new Error(`"config.gpus" field is missing`)
     if (config.gpus.length === 0) throw new Error(`"config.gpus" field is empty`)
