@@ -15,7 +15,11 @@ const log = createLogger({
         format.splat(),
         format.printf(({ level, message, timestamp }) => `[${timestamp}][${level.toUpperCase()}] ${message}`)
     ),
-    transports: [new transports.Console({ format: format.colorize({ all: true }) })]
+    transports: [
+        process.stdout.isTTY
+            ? new transports.Console({ format: format.colorize({ all: true }) })
+            : new transports.Console()
+    ]
 })
 
 export default log
