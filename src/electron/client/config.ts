@@ -34,24 +34,28 @@ const updateFromEnv = (config: ConfigJson) => {
 }
 
 const updateFromCli = (config: ConfigJson) => {
-    const args = commandLineArgs([
-        { name: 'bin', alias: 'b', defaultValue: config.binary },
-        {
-            name: 'gpus',
-            alias: 'g',
-            type(gpus) {
-                return gpus
-                    .split(',')
-                    .map((gpu) => gpu.trim())
-                    .filter(Boolean)
+    const args = commandLineArgs(
+        [
+            { name: 'bin', alias: 'b', defaultValue: config.binary },
+            {
+                name: 'gpus',
+                alias: 'g',
+                type(gpus) {
+                    return gpus
+                        .split(',')
+                        .map((gpu) => gpu.trim())
+                        .filter(Boolean)
+                },
+                defaultValue: config.gpus
             },
-            defaultValue: config.gpus
-        },
-        { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
-        { name: 'pool', alias: 'p', defaultValue: config.pool },
-        { name: 'rig', alias: 'r', defaultValue: config.rig },
-        { name: 'wallet', alias: 'w', defaultValue: config.wallet }
-    ])
+            { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
+            { name: 'pool', alias: 'p', defaultValue: config.pool },
+            { name: 'rig', alias: 'r', defaultValue: config.rig },
+            { name: 'wallet', alias: 'w', defaultValue: config.wallet }
+        ],
+        // see https://github.com/75lb/command-line-args/issues/103
+        { argv: 'electron' in process.versions ? process.argv.slice(1) : undefined }
+    )
 
     config.binary = args.bin as string
     config.gpus = args.gpus as string[]
