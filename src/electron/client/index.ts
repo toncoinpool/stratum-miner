@@ -52,7 +52,10 @@ class TonPoolClient extends EventEmitter {
 
         const onError = (error: Error) => {
             log.error(error)
-            this.emit('error', error)
+
+            if (this.listenerCount('error') > 0) {
+                this.emit('error', error)
+            }
         }
 
         const miners = config.gpus.map((id) =>
