@@ -86,20 +86,31 @@ class TonPoolClient extends EventEmitter {
                 log.info('connection established')
 
                 // TODO: move subscribe() and authorize() inside the Client
-                // TODO: do not reconnect when server rejects subscribe or authorize requests
                 try {
                     const result = await this.client!.subscribe()
                     log.info('connection subscribed')
                     miners.forEach((miner) => miner.setComplexity(result[1]))
-
-                    await this.client!.authorize()
-                    log.info('connection authorized')
-
-                    this.state = this.CONNECTED
-                    this.emit('connect')
                 } catch (error) {
                     onError(new Error(`connection error: ${(error as Error).message}`))
+
+                    if (/server did not respond/.test((error as Error).message) === false) {
+                        return this.stop()
+                    }
                 }
+
+                try {
+                    await this.client!.authorize()
+                    log.info('connection authorized')
+                } catch (error) {
+                    onError(new Error(`connection error: ${(error as Error).message}`))
+
+                    if (/server did not respond/.test((error as Error).message) === false) {
+                        return this.stop()
+                    }
+                }
+
+                this.state = this.CONNECTED
+                this.emit('connect')
             })
             .on('message', (message) => {
                 if ('method' in message && message.method === 'mining.set_target') {
