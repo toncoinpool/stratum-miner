@@ -72,6 +72,17 @@
             "bin/**",
             "data/**",
             "config/config.json"
-        ]
+        ],
+        "appImage": {
+            "artifactName": "ton-pool-client-${version}-${arch}.AppImage"
+        },
+        "linux": {
+            "target": [
+                {
+                    "target": "AppImage",
+                    "arch": "x64"
+                }
+            ]
+        }
     }
 }
