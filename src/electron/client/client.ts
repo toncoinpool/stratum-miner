@@ -8,6 +8,18 @@ type ServerReply =
     | { id: number; error: null; result: unknown }
 type Message = ServerRequest | ServerReply
 
+export class StratumError extends Error {
+    constructor(
+        public method: string,
+        public id: number,
+        public code: number,
+        public description: string,
+        public extra: unknown = null
+    ) {
+        super(`"${method}" error: ${code} ${description}`)
+    }
+}
+
 interface Client {
     emit(event: 'close', code: number, reason: string): boolean
     emit(event: 'error', error: Error): boolean
@@ -150,7 +162,7 @@ class Client extends EventEmitter {
 
                 return message.error === null
                     ? resolve(message.result)
-                    : reject(new Error(`"${method}" error: ${message.error[0]} ${message.error[1]}`))
+                    : reject(new StratumError(method, id, message.error[0], message.error[1], message.error[2]))
             }
 
             this.on('message', onResponse)

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import EventEmitter from 'events'
-import Client from './client'
+import Client, { StratumError } from './client'
 import { Config } from './config'
 import log from './logger'
 import Miner from './miner'
@@ -144,19 +144,13 @@ class TonPoolClient extends EventEmitter {
                         log.info('share submitted')
                         this.emit('submit')
                     },
-                    ({ message }: Error) => {
-                        onError(new Error(`miner error: failed to submit share: ${message}`))
+                    (error: Error) => {
+                        onError(new Error(`miner error: failed to submit share: ${error.message}`))
 
-                        if (/21 Job not found/.test(message)) {
-                            return this.emit('submitStale')
-                        }
-
-                        if (/22 Duplicate share/.test(message)) {
-                            return this.emit('submitDuplicate')
-                        }
-
-                        if (/23 Low difficulty share/.test(message)) {
-                            return this.emit('submitInvalid')
+                        if (error instanceof StratumError) {
+                            if (error.code === 21) return this.emit('submitStale')
+                            if (error.code === 22) return this.emit('submitDuplicate')
+                            if (error.code === 23) return this.emit('submitInvalid')
                         }
 
                         return undefined
