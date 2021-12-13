@@ -198,8 +198,18 @@
                     return undefined
                 }
 
-                devices.value = data.map((el, i) => ({ label: el, value: i }))
+                return devices.value = data.map((el, i) => ({ label: el, value: i }))
             })
+            
+            window.ipcRenderer.on('connect', () => console.log('connect event'))
+            window.ipcRenderer.on('error', (event: any, error: Error) => console.log('error event', error))
+            window.ipcRenderer.on('hashrate', (event: any, gpuId: string, hashrate: bigint) => console.log('hashrate event', gpuId, hashrate))
+            window.ipcRenderer.on('reconnect', () => console.log('reconnect event'))
+            window.ipcRenderer.on('stop', () => console.log('stop event'))
+            window.ipcRenderer.on('submit', () => console.log('submit event'))
+            window.ipcRenderer.on('submitDuplicate', () => console.log('submitDuplicate event'))
+            window.ipcRenderer.on('submitInvalid', () => console.log('submitInvalid event'))
+            window.ipcRenderer.on('submitStale', () => console.log('submitStale event'))
 
             return {
                 isLoadingGpus,

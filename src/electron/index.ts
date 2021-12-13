@@ -20,6 +20,16 @@ const createWindow = () => {
 
     void mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
 
+    TonPoolClient.on('connect', () => mainWindow.webContents.send('connect'))
+    TonPoolClient.on('error', (error) => mainWindow.webContents.send('error', error))
+    TonPoolClient.on('hashrate', (gpuId, hashrate) => mainWindow.webContents.send('hashrate', gpuId, hashrate))
+    TonPoolClient.on('reconnect', () => mainWindow.webContents.send('reconnect'))
+    TonPoolClient.on('stop', () => mainWindow.webContents.send('stop'))
+    TonPoolClient.on('submit', () => mainWindow.webContents.send('submit'))
+    TonPoolClient.on('submitDuplicate', () => mainWindow.webContents.send('submitDuplicate'))
+    TonPoolClient.on('submitInvalid', () => mainWindow.webContents.send('submitInvalid'))
+    TonPoolClient.on('submitStale', () => mainWindow.webContents.send('submitStale'))
+
     if (isDev) {
         mainWindow.webContents.openDevTools()
     }
