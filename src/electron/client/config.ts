@@ -34,6 +34,8 @@ const updateFromEnv = (config: ConfigJson) => {
 }
 
 const updateFromCli = (config: ConfigJson) => {
+    // fix for "electron:dev" npm script
+    const isDevElectron = process.argv.length === 2 && /electron$/.test(process.argv[0]!) && process.argv[1] === '.' // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const args = commandLineArgs(
         [
             { name: 'bin', alias: 'b', defaultValue: config.binary },
@@ -54,7 +56,7 @@ const updateFromCli = (config: ConfigJson) => {
             { name: 'wallet', alias: 'w', defaultValue: config.wallet }
         ],
         // see https://github.com/75lb/command-line-args/issues/103
-        { argv: 'electron' in process.versions ? process.argv.slice(1) : undefined }
+        { argv: 'electron' in process.versions && !isDevElectron ? process.argv.slice(1) : undefined }
     )
 
     config.binary = args.bin as string
