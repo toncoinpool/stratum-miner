@@ -8,7 +8,13 @@ jobs:
 
         strategy:
             matrix:
-                os: [ubuntu-latest]
+                include:
+                    - os: ubuntu-latest
+                      platform: linux
+                    - os: macos-latest
+                      platform: mac
+                    - os: windows-latest
+                      platform: windows
 
         steps:
             - uses: actions/checkout@v2
@@ -18,7 +24,7 @@ jobs:
                   cache: 'npm'
             - name: install dependencies
               run: npm install
-            - name: release
+            - name: release ${{ matrix.platform }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: npm run app:release -- --linux
+              run: npm run app:release -- --${{ matrix.platform }}
