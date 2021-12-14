@@ -63,7 +63,14 @@
     "build": {
         "appId": "com.toncoinpool.stratum-miner",
         "productName": "TON Stratum Miner",
+        "mac": {
+            "target": "dmg"
+        },
+        "dmg": {
+            "writeUpdateInfo": false
+        },
         "nsis": {
+            "differentialPackage": false,
             "oneClick": false,
             "allowToChangeInstallationDirectory": true
         },
