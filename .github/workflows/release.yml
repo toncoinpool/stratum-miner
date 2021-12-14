@@ -7,14 +7,15 @@ jobs:
         runs-on: ${{ matrix.os }}
 
         strategy:
+            max-parallel: 1
             matrix:
                 include:
-                    - os: ubuntu-latest
-                      platform: linux
-                    - os: macos-latest
-                      platform: mac
                     - os: windows-latest
                       platform: windows
+                    - os: macos-latest
+                      platform: mac
+                    - os: ubuntu-latest
+                      platform: linux
 
         steps:
             - uses: actions/checkout@v2
