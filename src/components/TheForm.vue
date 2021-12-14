@@ -108,6 +108,7 @@
 
     // import { Address } from 'ton'
     import { formatHashes } from '../composables/hashes-utils'
+    import BigDecimal from 'decimal.js'
     import { ElButton, ElForm, ElFormItem, ElInput, ElSelectV2, ElDialog, ElPopover } from 'element-plus'
     import 'element-plus/es/components/button/style/css'
     import 'element-plus/es/components/form/style/css'
@@ -161,17 +162,15 @@
             const isError = ref(false)
             const errorMessage = ref('')
 
-            const hashrates = ref<{ gpuId: string, hashrate: bigint }[]>([])
+            const hashrates = ref<{ gpuId: string, hashrate: string }[]>([])
             const hashrate = computed(() => {
-                if (hashrates.value.length === 0) return 0n
+                if (hashrates.value.length === 0) return '0 '
 
                 const reduced = hashrates.value.reduce((acc, el) => {
-                    acc += el.hashrate
+                    return new BigDecimal(el.hashrate).add(acc)
+                }, new BigDecimal('0'))
 
-                    return acc
-                }, 0n)
-
-                return formatHashes((reduced / BigInt(hashrates.value.length)).toString())
+                return formatHashes(reduced.div(hashrates.value.length).toFixed(0))
             })
 
             const shares = reactive({
@@ -242,7 +241,7 @@
                 isMiningStarted.value = false
             })
 
-            window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: bigint) => {
+            window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: string) => {
                 const result = hashrates.value.filter(el => el.gpuId !== gpuId)
 
                 result.push({ gpuId, hashrate })
@@ -272,7 +271,7 @@
                 return undefined
             })
 
-            watch(isMiningStarted, (isMining) => {
+            watch(isMiningStarted, (isMining): void => {
                 if (isMining) {
                     return undefined
                 }

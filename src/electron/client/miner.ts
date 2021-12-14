@@ -46,15 +46,15 @@ export interface Benchmark extends EventEmitter {
 
 interface Miner {
     emit(event: 'error', error: Error): boolean
-    emit(event: 'hashrate', hashrate: bigint): boolean
+    emit(event: 'hashrate', hashrate: string): boolean
     emit(event: 'success', solution: [string, string, string, string]): boolean
 
     on(event: 'error', listener: (error: Error) => void): this
-    on(event: 'hashrate', listener: (hashrate: bigint) => void): this
+    on(event: 'hashrate', listener: (hashrate: string) => void): this
     on(event: 'success', listener: (solution: [string, string, string, string]) => void): this
 
     once(event: 'error', listener: (error: Error) => void): this
-    once(event: 'hashrate', listener: (hashrate: bigint) => void): this
+    once(event: 'hashrate', listener: (hashrate: string) => void): this
     once(event: 'success', listener: (solution: [string, string, string, string]) => void): this
 }
 
@@ -158,7 +158,7 @@ class Miner extends EventEmitter {
                     .filter((el): el is string => el !== undefined)
 
                 if (!devices.length) {
-                    return reject(stderr)
+                    return reject(stderr || error)
                 }
 
                 resolve(devices)
@@ -236,7 +236,9 @@ class Miner extends EventEmitter {
                 return undefined
             }
 
-            return this.emit('hashrate', BigInt(Math.round(Number.parseFloat(hashrate))) * BigInt(1e6))
+            const value = BigInt(Math.round(Number.parseFloat(hashrate))) * BigInt(1e6)
+
+            return this.emit('hashrate', value.toString())
         })
     }
 
