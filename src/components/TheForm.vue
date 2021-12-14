@@ -49,15 +49,32 @@
             </el-form-item>
         </el-form>
         <div class="app__form-button-wrapper">
-            <el-button
+            <el-popover
                 v-if="isMiningStarted"
-                round
-                class="app__form-button"
-                type="danger"
-                :disabled="!fieldsCompleted"
-                @click="onToggleMining"
-                v-text="'Stop mining'"
-            />
+                placement="top"
+                title="Statistics"
+                :width="200"
+                trigger="hover"
+            >
+                <template #reference>
+                    <el-button
+                        round
+                        class="app__form-button"
+                        type="danger"
+                        @click="onToggleMining"
+                    >
+                        {{ hashrate }}H/s
+                    </el-button>
+                </template>
+                <div>
+                    <span>Hashrate: {{ hashrate }}H/s</span><br>
+                    <span>Total shares: {{ sharesTotal }}</span><br><br>
+                    <span>Valid: {{ submitted }}</span><br>
+                    <span>Invalid: {{ invalid }}</span><br>
+                    <span>Stale: {{ stale }}</span><br>
+                    <span>Duplicated: {{ duplicated }}</span>
+                </div>
+            </el-popover>
             <el-button
                 v-else-if="isLoadingGpus"
                 round
@@ -87,15 +104,18 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, computed } from 'vue'
+    import { defineComponent, ref, toRefs, reactive, computed, watch } from 'vue'
 
-    import { ElButton, ElForm, ElFormItem, ElInput, ElSelectV2, ElDialog } from 'element-plus'
+    // import { Address } from 'ton'
+    import { formatHashes } from '../composables/hashes-utils'
+    import { ElButton, ElForm, ElFormItem, ElInput, ElSelectV2, ElDialog, ElPopover } from 'element-plus'
     import 'element-plus/es/components/button/style/css'
     import 'element-plus/es/components/form/style/css'
     import 'element-plus/es/components/form-item/style/css'
     import 'element-plus/es/components/input/style/css'
     import 'element-plus/es/components/select-v2/style/css'
     import 'element-plus/es/components/dialog/style/css'
+    import 'element-plus/es/components/popover/style/css'
 
     interface MiningConfig {
         gpus: string[]
@@ -113,7 +133,8 @@
             ElFormItem,
             ElInput,
             ElSelectV2,
-            ElDialog
+            ElDialog,
+            ElPopover
         },
         setup () {
             const pools = ref([
@@ -139,6 +160,32 @@
             const isLoadingGpus = ref(false)
             const isError = ref(false)
             const errorMessage = ref('')
+
+            const hashrates = ref<{ gpuId: string, hashrate: bigint }[]>([])
+            const hashrate = computed(() => {
+                if (hashrates.value.length === 0) return 0n
+
+                const reduced = hashrates.value.reduce((acc, el) => {
+                    acc += el.hashrate
+
+                    return acc
+                }, 0n)
+
+                return formatHashes((reduced / BigInt(hashrates.value.length)).toString())
+            })
+
+            const shares = reactive({
+                submitted: 0,
+                stale: 0,
+                duplicated: 0,
+                invalid: 0
+            })
+
+            const sharesTotal = computed(() => Object.entries(shares).reduce((acc, [ _key, value ]) => {
+                acc += value
+
+                return acc
+            }, 0))
 
             const fieldsCompleted = computed(() =>
                 pool.value
@@ -186,9 +233,31 @@
                 errorMessage.value = ''
             }
 
-            window.ipcRenderer.on('miningStart', () => { isMiningStarted.value = true })
-            window.ipcRenderer.on('miningStop', () => { isMiningStarted.value = false })
-            window.ipcRenderer.on('getDevices', (_event: any, error: any, data: string[]) => {
+            window.ipcRenderer.on('connect', () => isMiningStarted.value = true)
+            window.ipcRenderer.on('stop', () => isMiningStarted.value = false)
+
+            window.ipcRenderer.on('error', (_event: any, error: Error) => {
+                isError.value = true
+                errorMessage.value = error.message
+                isMiningStarted.value = false
+            })
+
+            window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: bigint) => {
+                const result = hashrates.value.filter(el => el.gpuId !== gpuId)
+
+                result.push({ gpuId, hashrate })
+
+                hashrates.value = result
+            })
+
+            window.ipcRenderer.on('reconnect', () => console.log('reconnect event'))
+            
+            window.ipcRenderer.on('submit', () => shares.submitted += 1)
+            window.ipcRenderer.on('submitDuplicate', () => shares.duplicated += 1)
+            window.ipcRenderer.on('submitInvalid', () => shares.invalid += 1)
+            window.ipcRenderer.on('submitStale', () => shares.stale += 1)
+
+            window.ipcRenderer.on('getDevices', (_event: any, error: any, data: string[]): void => {
                 isLoadingGpus.value = false
 
                 if (error !== null) {
@@ -198,18 +267,22 @@
                     return undefined
                 }
 
-                return devices.value = data.map((el, i) => ({ label: el, value: i }))
+                devices.value = data.map((el, i) => ({ label: el, value: i }))
+
+                return undefined
             })
-            
-            window.ipcRenderer.on('connect', () => console.log('connect event'))
-            window.ipcRenderer.on('error', (event: any, error: Error) => console.log('error event', error))
-            window.ipcRenderer.on('hashrate', (event: any, gpuId: string, hashrate: bigint) => console.log('hashrate event', gpuId, hashrate))
-            window.ipcRenderer.on('reconnect', () => console.log('reconnect event'))
-            window.ipcRenderer.on('stop', () => console.log('stop event'))
-            window.ipcRenderer.on('submit', () => console.log('submit event'))
-            window.ipcRenderer.on('submitDuplicate', () => console.log('submitDuplicate event'))
-            window.ipcRenderer.on('submitInvalid', () => console.log('submitInvalid event'))
-            window.ipcRenderer.on('submitStale', () => console.log('submitStale event'))
+
+            watch(isMiningStarted, (isMining) => {
+                if (isMining) {
+                    return undefined
+                }
+
+                hashrates.value = []
+                shares.submitted = 0
+                shares.stale = 0
+                shares.duplicated = 0
+                shares.invalid = 0
+            })
 
             return {
                 isLoadingGpus,
@@ -225,6 +298,9 @@
                 gpus,
                 wallet,
                 rig,
+                hashrate,
+                sharesTotal,
+                ...toRefs(shares),
                 onToggleMining,
                 getDevices,
                 clearError

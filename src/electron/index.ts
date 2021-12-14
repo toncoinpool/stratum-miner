@@ -9,7 +9,7 @@ const baseConfig = readConfig()
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-        height: 450,
+        height: 480,
         width: 350,
         resizable: false,
         maximizable: false,
@@ -33,6 +33,11 @@ const createWindow = () => {
     if (isDev) {
         mainWindow.webContents.openDevTools()
     }
+
+    mainWindow.webContents.on('new-window', (e, url) => {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
 }
 
 // This method will be called when Electron has finished

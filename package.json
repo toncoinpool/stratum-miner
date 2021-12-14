@@ -21,8 +21,9 @@
     },
     "dependencies": {
         "command-line-args": "^5.2.0",
+        "decimal.js": "^10.3.1",
         "element-plus": "^1.2.0-beta.5",
-        "ton": "^6.2.1",
+        "ton": "^6.3.0",
         "tslib": "^2.3.1",
         "vue": "^3.2.24",
         "winston": "^3.3.3",

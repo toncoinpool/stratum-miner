@@ -19,7 +19,8 @@
     }
 
     .app__frame-body {
-        padding: 0 25px 25px 25px;
+        padding: 0 25px 15px 25px;
         overflow: auto;
+        min-height: 100%;
     }
 </style>
