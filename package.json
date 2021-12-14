@@ -91,7 +91,7 @@
             "publishAutoUpdate": false
         },
         "appImage": {
-            "artifactName": "ton-pool-client-${version}-${arch}.AppImage"
+            "artifactName": "TON-Stratum-Miner-${version}-${arch}.AppImage"
         },
         "linux": {
             "target": [
