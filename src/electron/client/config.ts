@@ -35,7 +35,7 @@ const updateFromEnv = (config: ConfigJson) => {
 
 const updateFromCli = (config: ConfigJson) => {
     // fix for "electron:dev" npm script
-    const isDevElectron = process.argv.length === 2 && /electron$/.test(process.argv[0]!) && process.argv[1] === '.' // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    const isDevElectron = process.argv.length === 2 && /electron$/i.test(process.argv[0]!) && process.argv[1] === '.' // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const args = commandLineArgs(
         [
             { name: 'bin', alias: 'b', defaultValue: config.binary },
