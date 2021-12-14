@@ -10,7 +10,7 @@
         "build:prod": "npm run clean && npm run build",
         "electron": "wait-on tcp:5000 && cross-env NODE_ENV=development electron .",
         "electron:dev": "npm run build:prod && concurrently -k \"cross-env BROWSER=none vite\" \"npm run electron\"",
-        "electron:build": "cross-env NODE_ENV=production tsc -p tsconfig.electron.json && electron-builder",
+        "electron:build": "cross-env NODE_ENV=production tsc -p tsconfig.electron.json && electron-builder -wml",
         "app:build": "npm run clean && vue-tsc --noEmit && cross-env ELECTRON=true vite build && npm run electron:build",
         "clean": "rimraf .cache && rimraf coverage && rimraf dist && rimraf dist_electron",
         "format": "prettier --check .",
