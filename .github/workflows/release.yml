@@ -1,13 +1,15 @@
 name: Build/Release
 
-on: push
+on:
+    push:
+        tags:
+            - '*'
 
 jobs:
     release:
         runs-on: ${{ matrix.os }}
 
         strategy:
-            max-parallel: 1
             matrix:
                 include:
                     - os: windows-latest
