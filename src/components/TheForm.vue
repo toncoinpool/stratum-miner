@@ -236,9 +236,9 @@
             window.ipcRenderer.on('stop', () => isMiningStarted.value = false)
 
             window.ipcRenderer.on('error', (_event: any, error: Error) => {
-                isError.value = true
-                errorMessage.value = error.message
-                isMiningStarted.value = false
+                // isError.value = true
+                // errorMessage.value = error.message
+                // isMiningStarted.value = false
             })
 
             window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: string) => {
