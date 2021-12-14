@@ -5,13 +5,18 @@
     "author": "Telezhka",
     "license": "ISC",
     "main": "dist/electron/index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/toncoinpool/stratum-miner.git"
+    },
     "scripts": {
         "build": "tsc -p tsconfig.prod.json && copyfiles config/* bin/* data/* dist/",
         "build:prod": "npm run clean && npm run build",
         "electron": "wait-on tcp:5000 && cross-env NODE_ENV=development electron .",
         "electron:dev": "npm run build:prod && concurrently -k \"cross-env BROWSER=none vite\" \"npm run electron\"",
-        "electron:build": "cross-env NODE_ENV=production tsc -p tsconfig.electron.json && electron-builder -wml",
+        "electron:build": "cross-env NODE_ENV=production tsc -p tsconfig.electron.json && electron-builder",
         "app:build": "npm run clean && vue-tsc --noEmit && cross-env ELECTRON=true vite build && npm run electron:build",
+        "app:release": "npm run clean && vue-tsc --noEmit && cross-env ELECTRON=true vite build && cross-env NODE_ENV=production tsc -p tsconfig.electron.json && electron-builder -p always",
         "clean": "rimraf .cache && rimraf coverage && rimraf dist && rimraf dist_electron",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",
@@ -74,6 +79,10 @@
             "data/**",
             "config/config.json"
         ],
+        "publish": {
+            "provider": "github",
+            "publishAutoUpdate": false
+        },
         "appImage": {
             "artifactName": "ton-pool-client-${version}-${arch}.AppImage"
         },
