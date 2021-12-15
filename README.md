@@ -1,6 +1,11 @@
 # Ton Coin Pool stratum-miner
 [Ton Coin Pool](https://toncoinpool.io) mining client based on official [tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
 
+## Prerequirements
+
+- Install latest GPU drivers for your platform: [CUDA-capable GPU (Nvidia)](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html) or [OpenCL-capable (AMD)](https://support.amd.com/en-us/download)
+- Download [Wallet app](https://ton.org/wallets) and create a wallet to obtain address.
+
 ## Usage
 
 Download the appropriate executable for your platform from [Releases](https://github.com/toncoinpool/stratum-miner/releases) page:
@@ -8,6 +13,13 @@ Download the appropriate executable for your platform from [Releases](https://gi
 - Windows: file with `.exe` extension
 - MacOS: `.zip` archive containing `.app` file
 - Linux: `.AppImage` file with GUI or `linux-headless.tar.gz` archive containing CLI-only binary
+
+## GUI Fields
+
+- Mining binary: select `pow-miner-gpu` binary for your system
+- GPUs: GPUs, that you want to use for mining
+- Wallet address: correct TON Wallet address. `DO NOT USE ANY CRYPTO EXCHANGE SERVICES WALLETS!!!`
+- Rig name: rig name for statistics on website. Allowed symbols are `latin`, `numeric`, ` `, `-`, `_`, max 24 symbols length
 
 ### Headless
 
