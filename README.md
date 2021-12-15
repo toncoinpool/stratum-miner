@@ -3,10 +3,21 @@
 
 ## Usage
 
+Download the appropriate executable for your platform from [Releases](https://github.com/toncoinpool/stratum-miner/releases) page:
+
+- Windows: file with `.exe` extension
+- MacOS: `.zip` archive containing `.app` file.
+- Linux: `.AppImage` file.
+
+### Headless
+
+You can run the client without the GUI directly from the command line:
+
 ```shell
-$ ./ton-pool-client --wallet <your-wallet-address> [--bin <name>] [--gpus <ids>] [--headless] [--pool <uri>] [--rig <name>]
+$ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [--gpus <ids>] [--pool <uri>] [--rig <name>]
 ```
 
+- `-h, --headless`: *Required*. Pass this flag to not open the client's GUI window
 - `-w, --wallet`: *Required*. Your TON wallet's address
 - `-b, --bin <name>`: Name of the miner binary. Can be one of:
 
@@ -25,7 +36,6 @@ $ ./ton-pool-client --wallet <your-wallet-address> [--bin <name>] [--gpus <ids>]
   Defaults to `pow-miner-cuda-ubuntu-20`
 - `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`. Only
 necessary on multi-GPU systems. Example: `--gpus 0,3,4`
-- `-h, --headless`: Pass this flag to not open the client's GUI window
 - `-p, --pool`: Pool address to connect to. Defaults to `wss://pplns.toncoinpool.io/stratum`
 - `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to `default`
 
