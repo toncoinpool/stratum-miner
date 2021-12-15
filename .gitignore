@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /dist_electron
+/TON-Stratum-Miner
 /node_modules
 .cache
 

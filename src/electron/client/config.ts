@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import { dirname, resolve } from 'path'
 import commandLineArgs from 'command-line-args'
 
 export interface ConfigJson {
@@ -19,7 +19,9 @@ export interface Config extends ConfigJson {
 }
 
 const resourcePath =
-    !process.env.NODE_ENV || process.env.NODE_ENV === 'production'
+    'pkg' in process
+        ? dirname(process.execPath)
+        : !process.env.NODE_ENV || process.env.NODE_ENV === 'production'
         ? process.resourcesPath
         : resolve(__dirname, '..', '..')
 
@@ -92,7 +94,7 @@ export default function readConfig(): Config {
     const dataDir = resolve(resourcePath, 'data')
     const baseBinaryPath = resolve(resourcePath, 'bin')
     const minerPath = resolve(baseBinaryPath, config.binary)
-    const version = '1.0.0'
+    const version = '1.0.1'
 
     return { ...config, dataDir, baseBinaryPath, minerPath, version }
 }

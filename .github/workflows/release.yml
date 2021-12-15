@@ -6,6 +6,37 @@ on:
             - '*'
 
 jobs:
+    release-pkg:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                include:
+                    - os: ubuntu-latest
+                      platform: linux
+
+        steps:
+            - id: get_version
+              uses: battila7/get-version-action@v2
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+                  cache: 'npm'
+            - name: install dependencies
+              run: npm install
+            - name: build-pkg ${{ matrix.platform }}
+              run: npm run pkg:build
+            - name: pack-pkg ${{ matrix.platform }}
+              run: tar -czvf TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON-Stratum-Miner
+            - uses: meeDamian/github-release@2.0
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  name: ${{ steps.get_version.outputs.version-without-v }}
+                  draft: true
+                  gzip: false
+                  files: TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz
+
     release:
         runs-on: ${{ matrix.os }}
 

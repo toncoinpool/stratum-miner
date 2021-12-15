@@ -6,8 +6,8 @@
 Download the appropriate executable for your platform from [Releases](https://github.com/toncoinpool/stratum-miner/releases) page:
 
 - Windows: file with `.exe` extension
-- MacOS: `.zip` archive containing `.app` file.
-- Linux: `.AppImage` file.
+- MacOS: `.zip` archive containing `.app` file
+- Linux: `.AppImage` file with GUI or `linux-headless.tar.gz` archive containing CLI-only binary
 
 ### Headless
 
