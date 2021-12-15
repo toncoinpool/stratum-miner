@@ -41,11 +41,7 @@ necessary on multi-GPU systems. Example: `--gpus 0,3,4`
 
 ## Ton Coin Pool endpoints
 
-Ton Coin Pool supports 3 mining modes: `solo`, `pps`, `pplns`.
-
-- [ `solo`: `wss://solo.toncoinpool.io` ] 0% comission pool, you will recieve rewards right from `giver`. Same as mining directly without any pool's software, but without need of any `lightserver` installed and with fancy online statistics for your rigs :)
-- [ `pps` ]: Under construction
-- [ `pplns` ]: Under construction
+- [ `pplns`: `wss://pplns.toncoinpool.io/stratum` ]
 
 ## Stratum
 
@@ -210,8 +206,6 @@ This method call will only be executed by clients
 
 ## TODO
 
-- omit seed from job submit
-- validate miner's wallet on client side
 - user-friendly logs
 
 ## License
