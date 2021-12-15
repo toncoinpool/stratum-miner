@@ -64,7 +64,12 @@
         "appId": "com.toncoinpool.stratum-miner",
         "productName": "TON Stratum Miner",
         "mac": {
-            "target": "dmg"
+            "target": "zip",
+            "artifactName": "TON-Stratum-Miner-${version}-${arch}-${os}.${ext}"
+        },
+        "win": {
+            "target": "portable",
+            "artifactName": "TON-Stratum-Miner-${version}-${arch}.${ext}"
         },
         "dmg": {
             "writeUpdateInfo": false
