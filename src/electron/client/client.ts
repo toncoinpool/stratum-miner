@@ -2,7 +2,9 @@ import EventEmitter from 'events'
 import WebSocket, { RawData } from 'ws'
 import log from './logger'
 
-type ServerRequest = { id: null; method: 'mining.set_target'; params: [string, string, string, string] }
+type ServerRequest =
+    | { id: null; method: 'mining.set_target'; params: [string, string, string, string] }
+    | { id: null; method: 'mining.notify'; params: ['expire', string] }
 type ServerReply =
     | { id: number; error: [number, string, string | null]; result: null }
     | { id: number; error: null; result: unknown }

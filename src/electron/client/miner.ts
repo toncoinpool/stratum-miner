@@ -131,6 +131,15 @@ class Miner extends EventEmitter {
         this.complexity = complexity
     }
 
+    setExpire(expire: string) {
+        this.expired = expire
+
+        // we were possibly waiting for new expire
+        if (!this.ref) {
+            this.run()
+        }
+    }
+
     setTarget(seed: string, expired: string, giver: string, wallet: string) {
         this.seed = seed
         this.expired = expired
@@ -172,13 +181,15 @@ class Miner extends EventEmitter {
             return undefined
         }
 
+        const currentExpire = this.expired
+
         this.ref = execFile(
             this.minerPath,
             [
                 '-vv',
                 ...['-g', this.id.toString()],
                 ...['-t', '100'],
-                ...['-e', this.expired],
+                ...['-e', currentExpire],
                 this.wallet,
                 ...[this.seed, this.complexity, this.iterations, this.giver],
                 this.solutionPath
@@ -187,6 +198,18 @@ class Miner extends EventEmitter {
             (error, stdout, stderr) => {
                 this.ref = undefined
 
+                if (error && error.signal === 'SIGABRT' && /expire_base [<>]=/.test(error.message)) {
+                    // expire changed while were starting the miner
+                    if (currentExpire !== this.expired) {
+                        return this.run()
+                    }
+
+                    const offset = Number.parseInt(currentExpire) - Math.floor(Date.now() / 1000)
+                    const signedOffset = `${offset >= 0 ? '+' : ''}${offset}`
+                    this.emit("error", new Error(`[${this.id}] miner error: invalid expire ${signedOffset}, waiting for new one...`)) // prettier-ignore
+
+                    return undefined // no reason to restart the miner, we'll get the same error
+                }
                 if (error && error.code && error.code > 1) {
                     this.emit("error", new Error(`[${this.id}] miner had unexpected exit code ${error.code} with error: ${error.message.trim()}`)) // prettier-ignore
                 }

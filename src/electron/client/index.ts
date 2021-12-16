@@ -120,6 +120,12 @@ class TonPoolClient extends EventEmitter {
 
                     miners.forEach((miner) => miner.setTarget(...message.params))
                 }
+
+                if ('method' in message && message.method === 'mining.notify') {
+                    if (message.params[0] === 'expire') {
+                        miners.forEach((miner) => miner.setExpire(message.params[1]))
+                    }
+                }
             })
             .on('reconnect', () => {
                 if (!reconnecting) {
