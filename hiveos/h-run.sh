@@ -2,6 +2,11 @@
 
 cd `dirname $0`
 
+# READ ENVS FROM FILE
+set -o allexport
+source $WALLET_CONF
+set +o allexport
+
 source h-manifest.conf
 
 CUSTOM_LOG_BASEDIR=`dirname "$CUSTOM_LOG_BASENAME"`

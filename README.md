@@ -59,7 +59,7 @@ Download the appropriate executable for your platform from [Releases](https://gi
 `https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.3.tar.gz`
 - `Hash algorithm` - оставить пустым
 - `Wallet and worker template` - писать **строго** `%WAL%` без пробелов
-- `Pool URL` - оставить как есть, никак не используется
+- `Pool URL` - любой url, в майнере никак не используется, например: `stratum+tcp://p2p.antpool.com:3333`
 - `Extra config arguments` - самое главное поле с настройками майнера:
 
   - `TONPOOL_BIN` - имя бинарника, `pow-miner-cuda-ubuntu-18` для CUDA или `pow-miner-opencl-ubuntu-18` для AMD
