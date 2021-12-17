@@ -198,7 +198,7 @@ class Miner extends EventEmitter {
             (error, stdout, stderr) => {
                 this.ref = undefined
 
-                if (error && error.signal === 'SIGABRT' && /expire_base [<>]=/.test(error.message)) {
+                if (error && /expire_base [<>]=/.test(error.message)) {
                     // expire changed while were starting the miner
                     if (currentExpire !== this.expired) {
                         return this.run()
