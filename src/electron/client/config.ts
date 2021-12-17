@@ -77,7 +77,9 @@ export default function readConfig(): Config {
         throw new Error(`failed to parse config: ${(error as Error).message}`)
     }
 
-    updateFromEnv(config)
+    if (!process.env.TONPOOL_IS_IN_HIVE) {
+        updateFromEnv(config)
+    }
     updateFromCli(config)
 
     if (!config.gpus) throw new Error(`"config.gpus" field is missing`)

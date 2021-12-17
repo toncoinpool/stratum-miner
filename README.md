@@ -21,6 +21,68 @@ Download the appropriate executable for your platform from [Releases](https://gi
 - Wallet address: correct TON Wallet address. `DO NOT USE ANY CRYPTO EXCHANGE SERVICES WALLETS!!!`
 - Rig name: rig name for statistics on website. Allowed symbols are `latin`, `numeric`, ` `, `-`, `_`, max 24 symbols length
 
+### HiveOS интеграция
+
+Данная инструкция рассчитана на пользователей, уже имеющих опыт работы с HiveOS.
+
+Важное замечание: майнер пока не отчитывается о хешрейте в HiveOS, хешрейт можно смотреть только на сайте
+[toncoinpool.io](https://toncoinpool.io)
+
+#### Добавление своего TON кошелька
+
+Следуя официальным инструкциям: https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
+
+- в поле `Монета` - впишите `toncoin`
+- в поле `Адрес` - впишите адрес вашего кошелька
+- в поле `Имя` - можно писать что угодно
+- поле `Источник` - нужно оставить пустым
+- переключатель `Получить баланс кошелька` оставить выключенным(как в официальной инструкции)
+
+#### Создание полётного листа
+
+Следуя официальным инструкциям: https://hiveos.farm/getting_started-start_custom_miner_ru
+
+При создании полётного листа:
+
+- `Имя` полётного листа - любое
+- `Монета` - созданный ранее `toncoin`
+- `Кошелёк` - созданный ранее
+- `Пул` - `Настроить в майнере`(`Configure in miner`)
+- `Майнер` - выберите `Custom` и нажмите на появившуюся кнопку `Setup Miner Config`
+
+Настройка кастомного майнера:
+
+- `Miner name` - должен будет подставиться самостоятельно после того, как вы введёте `Installation URL`. Если этого не
+произошло, впишите `TON_Stratum_Miner_HiveOS`(без версии)
+- `Installation URL` - `https://github.com/toncoinpool/stratum-miner/releases/latest/download/TON_Stratum_Miner_HiveOS-<version>.tar.gz`
+где `<version>` - это **последняя** версия майнера(`1.0.3`, `1.1.0`, и т.д.). Например:
+`https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.3.tar.gz`
+- `Hash algorithm` - оставить пустым
+- `Wallet and worker template` - писать **строго** `%WAL%` без пробелов
+- `Pool URL` - оставить как есть, никак не используется
+- `Extra config arguments` - самое главное поле с настройками майнера:
+
+  - `TONPOOL_BIN` - имя бинарника, `pow-miner-cuda-ubuntu-18` для CUDA или `pow-miner-opencl-ubuntu-18` для AMD
+  - `TONPOOL_GPUS` - список, через запятую, айди видеокарт, которые должны использоваться майнером, где `0` - первый
+  девайс, `1` - второй, и так далее. Примеры: `0` для одного девайса; `0,3,4` для первого, четвёртого и пятого
+  - `TONPOOL_RIGNAME` - имя рига, для отображения в статистике на сайте, может быть любой **слитной** строкой из
+  латинских букв и цифр(никаких других символов и кириллицы)
+
+  Пример:
+
+  ```
+  TONPOOL_BIN=pow-miner-cuda-ubuntu-18
+  TONPOOL_GPUS=0,1,2
+  TONPOOL_RIGNAME=myHiveRig1
+  ```
+- Жмём `Apply Changes`(`подтвердить изменения`)
+- В меню создания полётного листа жмём `Создать полётный лист`
+
+Для применения нового полётного листа следуйте инструкциям в разделе `Как начать майнить в Hive OS?` на странице: https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
+
+Автоматическое обновление майнеров пока не реализовано, после выхода новой версии, повторите
+вышеописанную инструкцию заного
+
 ### Headless
 
 You can run the client without the GUI directly from the command line:
