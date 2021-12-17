@@ -15,6 +15,4 @@ if [[ -z "$WALLET_ADR" ]]; then
     exit 1
 fi
 
-chmod +x ./h-run.sh
-
 exit 0
