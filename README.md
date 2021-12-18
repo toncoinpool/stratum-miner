@@ -25,9 +25,6 @@ Download the appropriate executable for your platform from [Releases](https://gi
 
 Данная инструкция рассчитана на пользователей, уже имеющих опыт работы с HiveOS.
 
-Важное замечание: майнер пока не отчитывается о хешрейте в HiveOS, хешрейт можно смотреть только на сайте
-[toncoinpool.io](https://toncoinpool.io)
-
 #### Добавление своего TON кошелька
 
 Следуя официальным инструкциям: https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
@@ -78,10 +75,11 @@ Download the appropriate executable for your platform from [Releases](https://gi
 - Жмём `Apply Changes`(`подтвердить изменения`)
 - В меню создания полётного листа жмём `Создать полётный лист`
 
-Для применения нового полётного листа следуйте инструкциям в разделе `Как начать майнить в Hive OS?` на странице: https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
+Для применения нового полётного листа следуйте инструкциям в разделе `Как начать майнить в Hive OS?` на странице:
+https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
 
-Автоматическое обновление майнеров пока не реализовано, после выхода новой версии, повторите
-вышеописанную инструкцию заного
+Автоматическое обновление майнеров пока не реализовано, после выхода новой версии, повторите вышеописанную инструкцию
+заного
 
 ### Headless
 

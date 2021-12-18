@@ -23,8 +23,6 @@ IFS="="; while read -r key value; do
     declare $key=$value
 done < <(echo "$CUSTOM_USER_CONFIG")
 
-echo $(date +%s) > ./data/started
-
 export TONPOOL_IS_IN_HIVE=1
 
 ./TON-Stratum-Miner \

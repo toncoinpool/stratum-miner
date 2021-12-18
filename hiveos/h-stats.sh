@@ -50,53 +50,59 @@ for (( i=0; i < $cnt; i++)); do
 	fi
 done
 
-#-------------------------------------------------------------------------
-# READ MINER STAT
-#-------------------------------------------------------------------------
-
-STATUS_HS=()
 STATUS_TEMP=()
 STATUS_FAN=()
 STATUS_BUS_NUMBERS=()
 
 for (( i=0; i < ${#indexes[@]}; i++)); do
-    #echo "GPU ID $i ${busids[${indexes[$i]}]}"
     BUS_NUMER_HEX=$(echo ${busids[${indexes[$i]}]:0:2} | tr "a-z" "A-Z")
     BUS_NUMBER=$(echo "obase=10; ibase=16; $BUS_NUMER_HEX" | bc)
 
     STATUS_BUS_NUMBERS+=($BUS_NUMBER)
     STATUS_TEMP+=(${temps[${indexes[$i]}]})
     STATUS_FAN+=(${fans[${indexes[$i]}]})
-
-    # fixed hashrate of 1 for each gpu
-    STATUS_HS+=(1)
 done
+
+#-------------------------------------------------------------------------
+# READ CLIENT STATS
+#-------------------------------------------------------------------------
+
+# get absolute path(for error log)
+TONPOOL_STATS_JSON="$(cd "$(dirname "./data/stats.json")"; pwd)/$(basename "./data/stats.json")"
+
+if test -f $TONPOOL_STATS_JSON; then
+    ar=$(jq -r ".ar" $TONPOOL_STATS_JSON)
+    hs=$(jq -r ".hs" $TONPOOL_STATS_JSON)
+    khs=$(jq -r ".khs" $TONPOOL_STATS_JSON)
+    uptime=$(jq -r ".uptime" $TONPOOL_STATS_JSON)
+else
+    echo "$TONPOOL_STATS_JSON does not exist"
+    ar="[]"
+    hs="[]"
+    khs=0
+    uptime=0
+fi
 
 #-------------------------------------------------------------------------
 # COLLECT
 #-------------------------------------------------------------------------
 
-khs=42
-hs=$(echo "${STATUS_HS[@]}" | jq -s '.')
 temp=$(echo "${STATUS_TEMP[@]}" | jq -s '.')
 fan=$(echo "${STATUS_FAN[@]}" | jq -s '.')
 bus_numbers=$(echo "${STATUS_BUS_NUMBERS[@]}" | jq -s '.')
 
-started=$(cat ./data/started)
-timestamp=$(date +%s)
-uptime=$((timestamp - started))
-
 source h-manifest.conf
 
 stats=$(
-  jq -n \
-    --argjson hs "$hs" \
-    --argjson temp "$temp" \
-    --argjson fan "$fan" \
-    --arg uptime "$uptime" \
-    --arg ver "$CUSTOM_VERSION" \
-    --argjson bus_numbers "$bus_numbers" \
-    '{"hs": $hs, "hs_units": "mhs", "temp": $temp, "fan": $fan, "uptime": $uptime, "ver": $ver, "bus_numbers":$bus_numbers}' <<<"$stats_raw"
+    jq -n \
+        --argjson hs "$hs" \
+        --argjson temp "$temp" \
+        --argjson fan "$fan" \
+        --argjson uptime "$uptime" \
+        --arg ver "$CUSTOM_VERSION" \
+        --argjson bus_numbers "$bus_numbers" \
+        --argjson ar "$ar" \
+        '{"hs": $hs, "hs_units": "mhs", "temp": $temp, "fan": $fan, "uptime": $uptime, "ver": $ver, "ar": $ar, "bus_numbers": $bus_numbers}' <<< "$stats_raw"
 )
 
 [[ -z $khs ]] && khs=0
