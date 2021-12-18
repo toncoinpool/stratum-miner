@@ -4,6 +4,21 @@
 
 cd `dirname $0`
 
+# READ ENVS FROM FILE
+set -o allexport
+source $WALLET_CONF
+set +o allexport
+
+# parse "Miner extra config"
+IFS="="; while read -r key value; do
+    # remove spaces and quotes
+    key=${key//[ \'\"]/""}
+    value=${value//[ \'\"]/""}
+    declare $key=$value
+done < <(echo "$CUSTOM_USER_CONFIG")
+
+TONPOOL_BIN=${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"}
+
 #-------------------------------------------------------------------------
 # READ GPU STATS FROM HIVE OS
 #-------------------------------------------------------------------------
@@ -17,13 +32,13 @@ busids=(`echo "$GPU_STATS_JSON" | jq -r ".busids[]"`)
 brands=(`echo "$GPU_STATS_JSON" | jq -r ".brand[]"`)
 indexes=()
 
-# filter arrays by $TYPE
+# filter arrays by $TONPOOL_BIN
 cnt=${#busids[@]}
 for (( i=0; i < $cnt; i++)); do
-	if [[ "${brands[$i]}" == "nvidia" && "$TYPE" == "cuda" ]]; then
+	if [[ "${brands[$i]}" == "nvidia" && "$TONPOOL_BIN" == "pow-miner-cuda-ubuntu-18" ]]; then
 	  indexes+=($i)
 	  continue
-	elif [[ "${brands[$i]}" == "amd" &&  "$TYPE" == "opencl" ]]; then
+	elif [[ "${brands[$i]}" == "amd" &&  "$TONPOOL_BIN" == "pow-miner-opencl-ubuntu-18" ]]; then
 	  indexes+=($i)
 	  continue
 	else # remove arrays data
