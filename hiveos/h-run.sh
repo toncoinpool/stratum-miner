@@ -1,33 +1,29 @@
 #!/bin/bash
 
-cd `dirname $0`
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
+TONPOOL_EXECUTABLE="$SCRIPT_DIR/TON-Stratum-Miner"
 
-# READ ENVS FROM FILE
-set -o allexport
-source $WALLET_CONF
-set +o allexport
+if [[ ! -f "$TONPOOL_HIVE_CONF" || ! -s "$TONPOOL_HIVE_CONF" ]]; then
+    echo "$TONPOOL_HIVE_CONF does not exist or empty. Please reinstall miner."
+    exit 1
+fi
+
+TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
+TONPOOL_GPUS=$(jq -r ".gpus" $TONPOOL_HIVE_CONF)
+TONPOOL_RIGNAME=$(jq -r ".rig" $TONPOOL_HIVE_CONF)
+WALLET_ADR=$(jq -r ".wallet" $TONPOOL_HIVE_CONF)
 
 source h-manifest.conf
 
 CUSTOM_LOG_BASEDIR=`dirname "$CUSTOM_LOG_BASENAME"`
 [[ ! -d $CUSTOM_LOG_BASEDIR ]] && mkdir -p $CUSTOM_LOG_BASEDIR
 
-# %WAL% in "Wallet and worker template "
-WALLET_ADR=$CUSTOM_TEMPLATE
-
-# parse "Miner extra config"
-IFS="="; while read -r key value; do
-    # remove spaces and quotes
-    key=${key//[ \'\"]/""}
-    value=${value//[ \'\"]/""}
-    declare $key=$value
-done < <(echo "$CUSTOM_USER_CONFIG")
-
 export TONPOOL_IS_IN_HIVE=1
 
-./TON-Stratum-Miner \
+$TONPOOL_EXECUTABLE \
     -w $WALLET_ADR \
-    -b ${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"} \
-    -g ${TONPOOL_GPUS:-"0"} \
-    -r ${TONPOOL_RIGNAME:-"default"} \
+    -b $TONPOOL_BIN \
+    -g $TONPOOL_GPUS \
+    -r $TONPOOL_RIGNAME \
     >> $CUSTOM_LOG_BASENAME.log 2>&1

@@ -1,11 +1,9 @@
 #!/bin/bash
 
-cd `dirname $0`
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
 
-# READ ENVS FROM FILE
-set -o allexport
 source $WALLET_CONF
-set +o allexport
 
 # %WAL% in "Wallet and worker template "
 WALLET_ADR=$CUSTOM_TEMPLATE
@@ -15,4 +13,31 @@ if [[ -z "$WALLET_ADR" ]]; then
     exit 1
 fi
 
-exit 0
+# parse "Miner extra config"
+IFS="="; while read -r key value; do
+    # remove spaces and quotes
+    key=${key//[ \'\"]/""}
+    value=${value//[ \'\"]/""}
+    declare $key=$value
+done < <(echo "$CUSTOM_USER_CONFIG")
+
+# set defaults
+TONPOOL_BIN=${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"}
+TONPOOL_GPUS=${TONPOOL_GPUS:-"0"}
+TONPOOL_RIGNAME=${TONPOOL_RIGNAME:-"default"}
+
+TONPOOL_HIVE_CONF_JSON=$(
+    jq -n \
+        --arg bin "$TONPOOL_BIN" \
+        --arg gpus "$TONPOOL_GPUS" \
+        --arg rig "$TONPOOL_RIGNAME" \
+        --arg wallet "$WALLET_ADR" \
+        '{"bin":$bin, "gpus":$gpus, "rig":$rig, "wallet":$wallet}'
+)
+
+if [ $? -ne 0 ]; then
+    echo "Invalid JSON string in Extra config arguments."
+    exit 1
+fi
+
+echo $TONPOOL_HIVE_CONF_JSON | jq '.' > $TONPOOL_HIVE_CONF

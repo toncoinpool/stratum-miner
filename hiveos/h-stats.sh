@@ -2,26 +2,15 @@
 
 # originally copied from https://github.com/tontechio/pow-miner-gpu-hiveos
 
-cd `dirname $0`
-
-# READ ENVS FROM FILE
-set -o allexport
-source $WALLET_CONF
-set +o allexport
-
-# parse "Miner extra config"
-IFS="="; while read -r key value; do
-    # remove spaces and quotes
-    key=${key//[ \'\"]/""}
-    value=${value//[ \'\"]/""}
-    declare $key=$value
-done < <(echo "$CUSTOM_USER_CONFIG")
-
-TONPOOL_BIN=${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"}
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
+TONPOOL_STATS_JSON="$SCRIPT_DIR/data/stats.json"
+TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
 
 #-------------------------------------------------------------------------
 # READ GPU STATS FROM HIVE OS
 #-------------------------------------------------------------------------
+
 GPU_STATS_JSON=`cat $GPU_STATS_JSON`
 
 # fill some arrays from gpu-stats
@@ -67,9 +56,6 @@ done
 # READ CLIENT STATS
 #-------------------------------------------------------------------------
 
-# get absolute path(for error log)
-TONPOOL_STATS_JSON="$(cd "$(dirname "./data/stats.json")"; pwd)/$(basename "./data/stats.json")"
-
 if test -f $TONPOOL_STATS_JSON; then
     ar=$(jq -r ".ar" $TONPOOL_STATS_JSON)
     hs=$(jq -r ".hs" $TONPOOL_STATS_JSON)
@@ -91,7 +77,7 @@ temp=$(echo "${STATUS_TEMP[@]}" | jq -s '.')
 fan=$(echo "${STATUS_FAN[@]}" | jq -s '.')
 bus_numbers=$(echo "${STATUS_BUS_NUMBERS[@]}" | jq -s '.')
 
-source h-manifest.conf
+source "$SCRIPT_DIR/h-manifest.conf"
 
 stats=$(
     jq -n \
@@ -102,7 +88,7 @@ stats=$(
         --arg ver "$CUSTOM_VERSION" \
         --argjson bus_numbers "$bus_numbers" \
         --argjson ar "$ar" \
-        '{"hs": $hs, "hs_units": "mhs", "temp": $temp, "fan": $fan, "uptime": $uptime, "ver": $ver, "ar": $ar, "bus_numbers": $bus_numbers}' <<< "$stats_raw"
+        '{"hs": $hs, "hs_units": "mhs", "temp": $temp, "fan": $fan, "uptime": $uptime, "ver": $ver, "ar": $ar, "bus_numbers": $bus_numbers}'
 )
 
 [[ -z $khs ]] && khs=0

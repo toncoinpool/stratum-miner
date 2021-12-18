@@ -36,6 +36,7 @@ jobs:
             - run: cp -r ./data/ ./TON_Stratum_Miner_HiveOS
             - run: cp ./hiveos/* ./TON_Stratum_Miner_HiveOS
             - run: cp ./TON-Stratum-Miner/TON-Stratum-Miner ./TON_Stratum_Miner_HiveOS
+            - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-config.sh
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-run.sh
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-stats.sh
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/TON-Stratum-Miner
