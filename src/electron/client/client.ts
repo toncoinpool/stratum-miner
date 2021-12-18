@@ -142,7 +142,7 @@ class Client extends EventEmitter {
     private async request(method: string, params: unknown) {
         const id = this.id++
 
-        log.info('%O', { id, method, params })
+        log.debug(JSON.stringify({ id, method, params }))
 
         await new Promise<void>((resolve, reject) =>
             this.ws.send(JSON.stringify({ id, method, params }), (err) => (err ? reject(err) : resolve()))

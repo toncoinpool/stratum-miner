@@ -47,7 +47,7 @@ class TonPoolClient extends EventEmitter {
     }
 
     start(config: Config): void {
-        log.info('starting client...')
+        log.info(`starting client ${config.version}...`)
         log.info(`mining for wallet ${config.wallet}`)
 
         const onError = (error: Error) => {
@@ -88,7 +88,7 @@ class TonPoolClient extends EventEmitter {
                 // TODO: move subscribe() and authorize() inside the Client
                 try {
                     const result = await this.client!.subscribe()
-                    log.info('connection subscribed')
+                    log.debug('connection subscribed')
                     miners.forEach((miner) => miner.setComplexity(result[1]))
                 } catch (error) {
                     onError(new Error(`connection error: ${(error as Error).message}`))
@@ -100,7 +100,7 @@ class TonPoolClient extends EventEmitter {
 
                 try {
                     await this.client!.authorize()
-                    log.info('connection authorized')
+                    log.debug('connection authorized')
                 } catch (error) {
                     onError(new Error(`connection error: ${(error as Error).message}`))
 
@@ -114,7 +114,7 @@ class TonPoolClient extends EventEmitter {
             })
             .on('message', (message) => {
                 if ('method' in message && message.method === 'mining.set_target') {
-                    log.info('new job received')
+                    log.debug('new job received')
 
                     this.state = this.MINING
 
