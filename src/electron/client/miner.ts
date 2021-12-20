@@ -64,7 +64,7 @@ class Miner extends EventEmitter {
     protected expired = ''
     protected complexity = ''
     protected giver = ''
-    protected iterations = '1000000000000000'
+    protected iterations = '9223372036854775807'
     protected minerPath: string
     protected ref?: ChildProcess = undefined
     protected seed = ''
@@ -90,7 +90,7 @@ class Miner extends EventEmitter {
                 'kQBWkNKqzCAwA9vjMwRmg7aY75Rf8lByPA9zKXoqGkHi8SM7',
                 '229760179690128740373110445116482216837',
                 '5391989333430127958933403017403926134727428884508114496220722049840',
-                '10000000000000000000'
+                '9223372036854775807'
             ],
             (error, stdout, stderr) => {
                 if (error) {
