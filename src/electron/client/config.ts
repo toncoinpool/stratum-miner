@@ -50,7 +50,7 @@ const updateFromCli = (config: ConfigJson) => {
                         .split(',')
                         .map((boost) => boost.trim())
                         .filter(Boolean)
-                        .map(Number.parseInt)
+                        .map((boost) => Number.parseInt(boost, 10))
                 },
                 defaultValue: config.boost
             },
