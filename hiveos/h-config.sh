@@ -23,16 +23,18 @@ done < <(echo "$CUSTOM_USER_CONFIG")
 
 # set defaults
 TONPOOL_BIN=${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"}
+TONPOOL_BOOST=${TONPOOL_BOOST:-"16"}
 TONPOOL_GPUS=${TONPOOL_GPUS:-"0"}
 TONPOOL_RIGNAME=${TONPOOL_RIGNAME:-"default"}
 
 TONPOOL_HIVE_CONF_JSON=$(
     jq -n \
         --arg bin "$TONPOOL_BIN" \
+        --arg boost "$TONPOOL_BOOST" \
         --arg gpus "$TONPOOL_GPUS" \
         --arg rig "$TONPOOL_RIGNAME" \
         --arg wallet "$WALLET_ADR" \
-        '{"bin":$bin, "gpus":$gpus, "rig":$rig, "wallet":$wallet}'
+        '{"bin":$bin, "boost":$boost, "gpus":$gpus, "rig":$rig, "wallet":$wallet}'
 )
 
 if [ $? -ne 0 ]; then

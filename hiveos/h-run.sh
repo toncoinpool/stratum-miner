@@ -10,6 +10,7 @@ if [[ ! -f "$TONPOOL_HIVE_CONF" || ! -s "$TONPOOL_HIVE_CONF" ]]; then
 fi
 
 TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
+TONPOOL_BOOST=$(jq -r ".boost" $TONPOOL_HIVE_CONF)
 TONPOOL_GPUS=$(jq -r ".gpus" $TONPOOL_HIVE_CONF)
 TONPOOL_RIGNAME=$(jq -r ".rig" $TONPOOL_HIVE_CONF)
 WALLET_ADR=$(jq -r ".wallet" $TONPOOL_HIVE_CONF)
@@ -24,5 +25,6 @@ export TONPOOL_IS_IN_HIVE=1
 $TONPOOL_EXECUTABLE \
     -w $WALLET_ADR \
     -b $TONPOOL_BIN \
+    -F $TONPOOL_BOOST \
     -g $TONPOOL_GPUS \
     -r $TONPOOL_RIGNAME 2>&1 | tee --append $CUSTOM_LOG_BASENAME.log

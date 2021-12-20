@@ -59,18 +59,30 @@ class TonPoolClient extends EventEmitter {
             }
         }
 
-        const miners = config.gpus.map((id) =>
-            new (/-custom/.test(config.binary) ? CustomMiner : Miner)(
-                Number.parseInt(id, 10),
+        const miners = config.gpus.map((id) => {
+            const gpuId = Number.parseInt(id, 10)
+            // if user passed -F 256 set all GPUs to 256
+            // if user passed -F 64,32 but has three GPUs, third GPU will use boost factor of 16
+            const defaultBoost = config.boost.length === 1 ? config.boost[0]! : 16
+            const boost = config.boost[gpuId] !== undefined ? config.boost[gpuId]! : defaultBoost
+            const miner = new (/-custom/.test(config.binary) ? CustomMiner : Miner)(
+                gpuId,
                 config.wallet,
                 config.minerPath,
-                config.dataDir
+                config.dataDir,
+                boost
             )
-                .on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
-                .on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
-        )
+            miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
+            miner.on('hashrate', (hashrate) => this.emit('hashrate', gpuId, hashrate))
+
+            return miner
+        })
 
         log.info(`mining using ${miners.length} gpus`)
+
+        if (config.boost.length > 1 || config.boost[0] !== 16) {
+            log.info(`using custom boost factors: ${JSON.stringify(miners.map((miner) => miner.boost))}`)
+        }
 
         log.info(`choosen pool is "${config.pool.replace('wss://', '')}"`)
 

@@ -3,17 +3,18 @@ import { dirname, resolve } from 'path'
 import commandLineArgs from 'command-line-args'
 
 export interface ConfigJson {
+    binary: string
+    boost: number[]
     gpus: string[]
     headless: boolean
     pool: string
-    wallet: string
     rig: string
-    binary: string
+    wallet: string
 }
 
 export interface Config extends ConfigJson {
-    dataDir: string
     baseBinaryPath: string
+    dataDir: string
     minerPath: string
     version: string
 }
@@ -42,6 +43,18 @@ const updateFromCli = (config: ConfigJson) => {
         [
             { name: 'bin', alias: 'b', defaultValue: config.binary },
             {
+                name: 'boost',
+                alias: 'F',
+                type(boosts) {
+                    return boosts
+                        .split(',')
+                        .map((boost) => boost.trim())
+                        .filter(Boolean)
+                        .map(Number.parseInt)
+                },
+                defaultValue: config.boost
+            },
+            {
                 name: 'gpus',
                 alias: 'g',
                 type(gpus) {
@@ -62,6 +75,7 @@ const updateFromCli = (config: ConfigJson) => {
     )
 
     config.binary = args.bin as string
+    config.boost = args.boost as number[]
     config.gpus = args.gpus as string[]
     config.headless = args.headless as boolean
     config.pool = args.pool as string
@@ -81,6 +95,11 @@ export default function readConfig(): Config {
         updateFromEnv(config)
     }
     updateFromCli(config)
+
+    if (config.boost.length === 0) {
+        config.boost = [16]
+    }
+    config.boost = config.boost.map((boost) => (boost > 16384 ? 16384 : boost)).map((boost) => (boost < 1 ? 1 : boost))
 
     if (!config.gpus) throw new Error(`"config.gpus" field is missing`)
     if (config.gpus.length === 0) throw new Error(`"config.gpus" field is empty`)

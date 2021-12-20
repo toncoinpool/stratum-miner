@@ -48,6 +48,7 @@ export default class CustomMiner extends Miner {
             [
                 '-vv',
                 ...['-g', this.id.toString()],
+                ...['-F', this.boost.toString()],
                 ...['-t', '100'],
                 ...['-e', currentExpire],
                 this.wallet,

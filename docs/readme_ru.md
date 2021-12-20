@@ -78,6 +78,9 @@
         девайс, `1` - второй, и так далее. Примеры: `0` для одного девайса; `0,3,4` для первого, четвёртого и пятого
     -   `TONPOOL_RIGNAME` - имя рига, для отображения в статистике на сайте, может быть любой **слитной** строкой из
         латинских букв и цифр(никаких других символов и кириллицы)
+    -   `TONPOOL_BOOST` - _необязательный_ параметр для указания бустфактора, как описано в [инструкциях pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
+        Может быть одним числом, чтобы применить его ко всем видеокартам, или списком чисел, через запятую, для
+        **каждого** GPU в `TONPOOL_GPUS`. По умолчанию используется бустфактор `16` для всех карт
 
     Пример:
 
@@ -85,6 +88,7 @@
     TONPOOL_BIN=pow-miner-cuda-ubuntu-18
     TONPOOL_GPUS=0,1,2
     TONPOOL_RIGNAME=myHiveRig1
+    TONPOOL_BOOST=1024,1024,64
     ```
 
 -   Жмём `Apply Changes`(`подтвердить изменения`)
@@ -103,7 +107,7 @@ https://hiveos.farm/guides-how_to_start_mine_in_Hive_OS_ru
 Вы можете запустить клиент без графического интерфейса напрямую из командной строки:
 
 ```shell
-$ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [--gpus <ids>] [--pool <uri>] [--rig <name>]
+$ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--gpus <ids>] [--pool <uri>] [--rig <name>]
 ```
 
 -   `-h, --headless`: _Обязательно_. Данный флаг предотвращает открытие окна графического интерфейса
@@ -127,6 +131,11 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
     По умолчанию `pow-miner-cuda-ubuntu-20`
 
+-   `-F --boost <boost-factors>`: Список, через запятую, бустфакторов из [pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
+    Если передать одно число, оно будет применено ко всем GPU в `--gpus`. Для индивидуальной настройки каждого GPU вы
+    должны перечислить бустфакторы в том же порядке, что в `--gpus` параметре. По умолчанию `16`. Примеры:
+    -   `-g 0,1,2 -F 64,32,512`
+    -   `-g 0,1,2 -F 512`
 -   `-g, --gpus <ids>`: Список, через запятую, идентификаторов GPU девайсов, которые должны использоваться майнером.
     По умолчанию `0`. Указывать стоит только на мульти-GPU системах. Пример: `--gpus 0,3,4`
 -   `-p, --pool`: Адрес пула. По умолчанию `wss://pplns.toncoinpool.io/stratum`

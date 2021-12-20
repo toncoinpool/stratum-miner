@@ -59,6 +59,7 @@ interface Miner {
 }
 
 class Miner extends EventEmitter {
+    public boost: number
     public id: number
 
     protected expired = ''
@@ -72,8 +73,9 @@ class Miner extends EventEmitter {
     protected stopped = false
     protected wallet: string
 
-    constructor(id: number, wallet: string, minerPath: string, dataDir: string) {
+    constructor(id: number, wallet: string, minerPath: string, dataDir: string, boost: number) {
         super()
+        this.boost = boost
         this.id = id
         this.minerPath = minerPath
         this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
@@ -188,6 +190,7 @@ class Miner extends EventEmitter {
             [
                 '-vv',
                 ...['-g', this.id.toString()],
+                ...['-F', this.boost.toString()],
                 ...['-t', '100'],
                 ...['-e', currentExpire],
                 this.wallet,
