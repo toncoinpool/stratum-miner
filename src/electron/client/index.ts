@@ -2,6 +2,7 @@
 import EventEmitter from 'events'
 import Client, { StratumError } from './client'
 import { Config } from './config'
+import CustomMiner from './custom-miner'
 import log from './logger'
 import Miner from './miner'
 
@@ -47,7 +48,7 @@ class TonPoolClient extends EventEmitter {
     }
 
     start(config: Config): void {
-        log.info(`starting client ${config.version}...`)
+        log.info(`starting client ${config.version} using ${config.binary}...`)
         log.info(`mining for wallet ${config.wallet}`)
 
         const onError = (error: Error) => {
@@ -59,7 +60,12 @@ class TonPoolClient extends EventEmitter {
         }
 
         const miners = config.gpus.map((id) =>
-            new Miner(Number.parseInt(id, 10), config.wallet, config.minerPath, config.dataDir)
+            new (/-custom/.test(config.binary) ? CustomMiner : Miner)(
+                Number.parseInt(id, 10),
+                config.wallet,
+                config.minerPath,
+                config.dataDir
+            )
                 .on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
                 .on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
         )

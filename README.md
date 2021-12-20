@@ -25,7 +25,9 @@ Download the appropriate executable for your platform from
 
 ### GUI Fields
 
--   Mining binary: select `pow-miner-gpu` binary for your system
+-   Mining binary: select `pow-miner-gpu` binary for your system. Each binary has a `Custom` version built from our
+    [fork](https://github.com/toncoinpool/pow-miner-gpu) of the official miners. `Custom` miners are not well-tested but
+    should have higher GPU utilization, especially on high end GPUs. Use at your own risk!
 -   GPUs: GPUs, that you want to use for mining
 -   Wallet address: correct TON Wallet address. `DO NOT USE ANY CRYPTO EXCHANGE SERVICES WALLETS!!!`
 -   Rig name: rig name for statistics on website. Allowed symbols are `latin`, `numeric`, ` `, `-`, `_`, max 24 symbols
@@ -69,8 +71,11 @@ Setting up custom miner:
 -   `Pool URL` - can be any url, not used by the client. Example: `stratum+tcp://p2p.antpool.com:3333`
 -   `Extra config arguments` - the most important field with client configuration:
 
-    -   `TONPOOL_BIN` - name of the mining binary: `pow-miner-cuda-ubuntu-18` for CUDA or `pow-miner-opencl-ubuntu-18`
-        for AMD
+    -   `TONPOOL_BIN` - one of:
+        -   `pow-miner-cuda-ubuntu-18` - CUDA mining binary
+        -   `pow-miner-cuda-ubuntu-18-custom` - _Experimental_ CUDA mining binary, see [GUI Fields](#gui-fields)
+        -   `pow-miner-opencl-ubuntu-18` - OpenCL mining binary
+        -   `pow-miner-opencl-ubuntu-18-custom` - _Experimental_ OpenCL mining binary, see [GUI Fields](#gui-fields)
     -   `TONPOOL_GPUS` - comma-separated list of GPU device Ids that should be used by miner where `0` - the first
         device, `1` - second, and so on. Examples: `0` for single GPU; `0,3,4` for the first, fourth and fifth GPUs.
     -   `TONPOOL_RIGNAME` - name of this rig to use on the stats screen on the website. Can be any string composed of
@@ -117,6 +122,9 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
     -   `pow-miner-cuda.exe`
     -   `pow-miner-opencl.exe`
+
+    Each binary has a `<name>-custom` version as well, see [GUI Fields](#gui-fields). Example:
+    `pow-miner-cuda-custom.exe`
 
     Defaults to `pow-miner-cuda-ubuntu-20`
 

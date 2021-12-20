@@ -61,16 +61,16 @@ interface Miner {
 class Miner extends EventEmitter {
     public id: number
 
-    private expired = ''
-    private complexity = ''
-    private giver = ''
-    private iterations = '1000000000000000'
-    private minerPath: string
-    private ref?: ChildProcess = undefined
-    private seed = ''
-    private solutionPath: string
-    private stopped = false
-    private wallet: string
+    protected expired = ''
+    protected complexity = ''
+    protected giver = ''
+    protected iterations = '1000000000000000'
+    protected minerPath: string
+    protected ref?: ChildProcess = undefined
+    protected seed = ''
+    protected solutionPath: string
+    protected stopped = false
+    protected wallet: string
 
     constructor(id: number, wallet: string, minerPath: string, dataDir: string) {
         super()
@@ -175,7 +175,7 @@ class Miner extends EventEmitter {
         })
     }
 
-    private run(): void {
+    protected run(): void {
         // once stopped, calling start() followed by setTarget() will start the mining loop again
         if (this.stopped) {
             return undefined
