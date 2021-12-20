@@ -7,6 +7,16 @@ import log from './logger'
 import Miner from './miner'
 
 interface TonPoolClient {
+    emit(event: 'connect'): boolean
+    emit(event: 'error', error: Error): boolean
+    emit(event: 'hashrate', gpuId: string, hashrate: string): boolean
+    emit(event: 'reconnect'): boolean
+    emit(event: 'stop'): boolean
+    emit(event: 'submit'): boolean
+    emit(event: 'submitDuplicate'): boolean
+    emit(event: 'submitInvalid'): boolean
+    emit(event: 'submitStale'): boolean
+
     on(event: 'connect', listener: () => void): this
     on(event: 'error', listener: (error: Error) => void): this
     on(event: 'hashrate', listener: (gpuId: string, hashrate: string) => void): this
@@ -73,7 +83,7 @@ class TonPoolClient extends EventEmitter {
                 boost
             )
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
-            miner.on('hashrate', (hashrate) => this.emit('hashrate', gpuId, hashrate))
+            miner.on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
 
             return miner
         })
