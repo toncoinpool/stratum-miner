@@ -191,7 +191,6 @@ class Miner extends EventEmitter {
                 '-vv',
                 ...['-g', this.id.toString()],
                 ...['-F', this.boost.toString()],
-                ...['-t', '100'],
                 ...['-e', currentExpire],
                 this.wallet,
                 ...[this.seed, this.complexity, this.iterations, this.giver],
