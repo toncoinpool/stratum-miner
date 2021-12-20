@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "ton-pool-client",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "author": "Telezhka",
     "license": "ISC",
     "main": "dist/electron/index.js",
