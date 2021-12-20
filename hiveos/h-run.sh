@@ -25,5 +25,4 @@ $TONPOOL_EXECUTABLE \
     -w $WALLET_ADR \
     -b $TONPOOL_BIN \
     -g $TONPOOL_GPUS \
-    -r $TONPOOL_RIGNAME \
-    >> $CUSTOM_LOG_BASENAME.log 2>&1
+    -r $TONPOOL_RIGNAME 2>&1 | tee --append $CUSTOM_LOG_BASENAME.log
