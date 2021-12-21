@@ -31,6 +31,10 @@
 -   `Rig name`: имя данного компьютера для отображения в статистике на нашем сайте. Разрешённые символы: `латиница`,
     `цифры`, ` `, `-`, `_`, максимальная длина - 24 символа
 
+### MinerstatOS интеграция
+
+Смотрите инструкцию [здесь](../integrations/minerstat/README.md)
+
 ### HiveOS интеграция
 
 Данная инструкция рассчитана на пользователей, уже имеющих опыт работы с HiveOS
@@ -66,7 +70,7 @@
     `https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.5.tar.gz`
 -   `Hash algorithm` - оставить пустым
 -   `Wallet and worker template` - писать **строго** `%WAL%` без пробелов
--   `Pool URL` - любой url, в майнере никак не используется, например: `stratum+tcp://p2p.antpool.com:3333`
+-   `Pool URL` - `pplns.toncoinpool.io:443/stratum` или любой другой - в майнере никак не используется
 -   `Extra config arguments` - самое главное поле с настройками майнера:
 
     -   `TONPOOL_BIN` - одно из:

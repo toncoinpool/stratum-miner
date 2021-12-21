@@ -41,13 +41,23 @@ jobs:
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-stats.sh
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/TON-Stratum-Miner
             - run: tar -zcf TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz TON_Stratum_Miner_HiveOS
+            - run: mkdir TON_Stratum_Miner_msOS
+            - run: mkdir TON_Stratum_Miner_msOS/bin
+            - run: cp ./bin/pow-miner-opencl-ubuntu-18 ./bin/pow-miner-cuda-ubuntu-18 ./bin/pow-miner-opencl-ubuntu-18-custom ./bin/pow-miner-cuda-ubuntu-18-custom ./TON_Stratum_Miner_msOS/bin
+            - run: cp -r ./config/ ./TON_Stratum_Miner_msOS
+            - run: cp -r ./data/ ./TON_Stratum_Miner_msOS
+            - run: cp ./integrations/minerstat/* ./TON_Stratum_Miner_msOS
+            - run: cp ./TON-Stratum-Miner/TON-Stratum-Miner ./TON_Stratum_Miner_msOS
+            - run: chmod 777 ./TON_Stratum_Miner_msOS/api
+            - run: chmod 777 ./TON_Stratum_Miner_msOS/TON-Stratum-Miner
+            - run: tar -zcf TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz -C TON_Stratum_Miner_msOS .
             - uses: meeDamian/github-release@2.0
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   name: ${{ steps.get_version.outputs.version-without-v }}
                   draft: true
                   gzip: false
-                  files: TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
+                  files: TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
 
     release:
         runs-on: ${{ matrix.os }}

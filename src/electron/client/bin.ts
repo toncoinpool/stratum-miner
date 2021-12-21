@@ -10,7 +10,7 @@ const config = readConfig()
 TonPoolClient.start(config)
 TonPoolClient.on('stop', () => process.exit())
 
-if (env.TONPOOL_IS_IN_HIVE) {
+if (env.TONPOOL_IS_IN_HIVE || config.integration?.toLowerCase() === 'msos') {
     const started = Math.floor(Date.now() / 1000)
     const statsPath = resolve(config.dataDir, 'stats.json')
     const hashrates = new Map(config.gpus.map((id) => [id, 0]))

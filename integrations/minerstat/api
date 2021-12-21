@@ -1,0 +1,34 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+TONPOOL_STATS_JSON="$SCRIPT_DIR/data/stats.json"
+
+if test -f $TONPOOL_STATS_JSON; then
+    shares_accepted=$(jq ".ar | .[0] | tostring" $TONPOOL_STATS_JSON)
+    shares_rejected=$(jq ".ar | .[1] | tostring" $TONPOOL_STATS_JSON)
+    hashrate_total=$(jq ".khs | . * 1000 | tostring" $TONPOOL_STATS_JSON)
+    uptime_in_sec=$(jq ".uptime | tostring" $TONPOOL_STATS_JSON)
+
+    hs_pairs="$(jq -r '.hs | to_entries | .[] | "gpu" + (.key | tostring) + "=" + (.value * 1000 * 1000 | tostring)' $TONPOOL_STATS_JSON)"
+
+    for key in ${hs_pairs}; do
+        eval ${key}
+    done
+
+    hashrate_gpu=",gpu0:$gpu0,gpu1:$gpu1,gpu2:$gpu2,gpu3:$gpu3,gpu4:$gpu4,gpu5:$gpu5,gpu6:$gpu6,gpu7:$gpu7,gpu8:$gpu8,gpu9:$gpu9,gpu10:$gpu10,gpu11:$gpu11,gpu12:$gpu12,gpu13:$gpu13,gpu14:$gpu14,gpu15:$gpu15"
+else
+    shares_accepted="0"
+    shares_rejected="0"
+    hashrate_total="0"
+    uptime_in_sec="1"
+fi
+
+pool="pplns.toncoinpool.io:443/stratum"
+
+# You can break the code on any error
+# echo "error"
+# exit 1
+
+# If everything went fine, status is reported back to the agent
+# Do not edit the this line (Break the code with echo "error", exit 1 on error)
+echo "hashrate_total:$hashrate_total,uptime:$uptime_in_sec,pool:$pool,shares_rejected:$shares_rejected,shares_accepted:$shares_accepted$hashrate_gpu"

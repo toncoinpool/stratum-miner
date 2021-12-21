@@ -33,6 +33,10 @@ Download the appropriate executable for your platform from
 -   Rig name: rig name for statistics on website. Allowed symbols are `latin`, `numeric`, ` `, `-`, `_`, max 24 symbols
     length
 
+### MinerstatOS integration
+
+Instructions can be found [here](integrations/minerstat/README.md)
+
 ### HiveOS integration
 
 This instructions are targeted at users experienced with HiveOS
@@ -68,7 +72,7 @@ Setting up custom miner:
     `https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.5.tar.gz`
 -   `Hash algorithm` - leave blank
 -   `Wallet and worker template` - **strictly** type `%WAL%` with no spaces
--   `Pool URL` - can be any url, not used by the client. Example: `stratum+tcp://p2p.antpool.com:3333`
+-   `Pool URL` - `pplns.toncoinpool.io:443/stratum` or it can be any other url since it is not used by the client
 -   `Extra config arguments` - the most important field with client configuration:
 
     -   `TONPOOL_BIN` - one of:

@@ -7,6 +7,7 @@ export interface ConfigJson {
     boost: number[]
     gpus: string[]
     headless: boolean
+    integration?: string
     pool: string
     rig: string
     wallet: string
@@ -36,12 +37,12 @@ const updateFromEnv = (config: ConfigJson) => {
     config.gpus = MINER_GPUS ? MINER_GPUS.replace(/ /g, '').split(',') : config.gpus
 }
 
-const updateFromCli = (config: ConfigJson) => {
+const parseCliConfig = (jsonConfig: ConfigJson): ConfigJson => {
     // fix for "electron:dev" npm script
     const isDevElectron = process.argv.length === 2 && /electron$/i.test(process.argv[0]!) && process.argv[1] === '.' // eslint-disable-line @typescript-eslint/no-non-null-assertion
     const args = commandLineArgs(
         [
-            { name: 'bin', alias: 'b', defaultValue: config.binary },
+            { name: 'bin', alias: 'b', defaultValue: jsonConfig.binary },
             {
                 name: 'boost',
                 alias: 'F',
@@ -52,7 +53,7 @@ const updateFromCli = (config: ConfigJson) => {
                         .filter(Boolean)
                         .map((boost) => Number.parseInt(boost, 10))
                 },
-                defaultValue: config.boost
+                defaultValue: jsonConfig.boost
             },
             {
                 name: 'gpus',
@@ -63,38 +64,45 @@ const updateFromCli = (config: ConfigJson) => {
                         .map((gpu) => gpu.trim())
                         .filter(Boolean)
                 },
-                defaultValue: config.gpus
+                defaultValue: jsonConfig.gpus
             },
             { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
-            { name: 'pool', alias: 'p', defaultValue: config.pool },
-            { name: 'rig', alias: 'r', defaultValue: config.rig },
-            { name: 'wallet', alias: 'w', defaultValue: config.wallet }
+            { name: 'integration', defaultValue: jsonConfig.integration },
+            { name: 'pool', alias: 'p', defaultValue: jsonConfig.pool },
+            { name: 'rig', alias: 'r', defaultValue: jsonConfig.rig },
+            { name: 'wallet', alias: 'w', defaultValue: jsonConfig.wallet }
         ],
         // see https://github.com/75lb/command-line-args/issues/103
         { argv: 'electron' in process.versions && !isDevElectron ? process.argv.slice(1) : undefined }
     )
 
-    config.binary = args.bin as string
-    config.boost = args.boost as number[]
-    config.gpus = args.gpus as string[]
-    config.headless = args.headless as boolean
-    config.pool = args.pool as string
-    config.rig = args.rig as string
-    config.wallet = args.wallet as string
+    return {
+        binary: args.bin as string,
+        boost: args.boost as number[],
+        gpus: args.gpus as string[],
+        headless: args.headless as boolean,
+        integration: args.integration as string,
+        pool: args.pool as string,
+        rig: args.rig as string,
+        wallet: args.wallet as string
+    }
 }
 
 export default function readConfig(): Config {
-    let config: ConfigJson
+    let jsonConfig: ConfigJson
     try {
-        config = JSON.parse(readFileSync(resolve(resourcePath, 'config', `config.json`), 'utf8')) as ConfigJson
+        jsonConfig = JSON.parse(readFileSync(resolve(resourcePath, 'config', `config.json`), 'utf8')) as ConfigJson
     } catch (error) {
         throw new Error(`failed to parse config: ${(error as Error).message}`)
     }
 
-    if (!process.env.TONPOOL_IS_IN_HIVE) {
-        updateFromEnv(config)
+    const cliConfig = parseCliConfig(jsonConfig)
+
+    if (!process.env.TONPOOL_IS_IN_HIVE && !cliConfig.integration) {
+        updateFromEnv(jsonConfig)
     }
-    updateFromCli(config)
+
+    const config = { ...jsonConfig, ...cliConfig }
 
     if (config.boost.length === 0) {
         config.boost = [16]
