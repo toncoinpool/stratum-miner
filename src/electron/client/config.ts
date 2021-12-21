@@ -123,7 +123,7 @@ export default function readConfig(): Config {
     const dataDir = resolve(resourcePath, 'data')
     const baseBinaryPath = resolve(resourcePath, 'bin')
     const minerPath = resolve(baseBinaryPath, config.binary)
-    const version = '1.0.10'
+    const version = '1.0.11'
 
     return { ...config, dataDir, baseBinaryPath, minerPath, version }
 }
