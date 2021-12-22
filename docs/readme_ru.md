@@ -151,12 +151,6 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 -   `-r, --rig`: Под каким именем будет видна статистика этого клиента на [toncoinpool.io](https://toncoinpool.io).
     По умолчанию `default`
 
-Пример:
-
-```shell
-$ ./TON-Stratum-Miner -h -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b cuda-20 -F 512 -g 0,1,2 -r myRig
-```
-
 ## Ton Coin Pool endpoints
 
 -   [ `pplns`: `wss://pplns.toncoinpool.io/stratum` ]

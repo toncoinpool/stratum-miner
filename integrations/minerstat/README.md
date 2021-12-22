@@ -42,14 +42,10 @@ fill in the fields:
         listed in `--gpus`. Defaults to `512` for CUDA or `64` for OpenCL. Examples:
         -   `-g 0,1,2 -F 64,32,512`
         -   `-g 0,1,2 -F 512`
-    -   `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`. Only
-        necessary on multi-GPU systems. Example: `--gpus 0,3,4`
+    -   `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`.
+        Example: `--gpus 0,3,4`
     -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io).
         Defaults to `default`
-
-    Full example:
-
-    `--integration msOS -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b cuda-18 -F 512 -g 0,1,2 -r msOSrig`
 
 -   `Extra args` - you can add `| tee log.txt` here to create a log file in `/home/minerstat/minerstat-os/clients/<miner-name>/`
     to help with troubleshooting in case of any errors.

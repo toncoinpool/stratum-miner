@@ -1,0 +1,12 @@
+{
+    "package": "TON_Stratum_Miner_raveOS-1.0.11",
+    "name": "TON-STRATUM-MINER",
+    "version": "1.0.11",
+    "description": "Ton Coin Pool Client",
+    "maintainer": "Telezhka",
+    "platforms": ["amd", "nvidia"],
+    "dual_coin": false,
+    "algo": ["ton"],
+    "executable": ["TON-Stratum-Miner"],
+    "rev": 1
+}

@@ -23,6 +23,7 @@ jobs:
               with:
                   node-version: 16
                   cache: 'npm'
+            - run: sudo apt-get install -y zip
             - name: install dependencies
               run: npm install
             - name: build-pkg ${{ matrix.platform }}
@@ -51,13 +52,26 @@ jobs:
             - run: chmod 777 ./TON_Stratum_Miner_msOS/api
             - run: chmod 777 ./TON_Stratum_Miner_msOS/TON-Stratum-Miner
             - run: tar -zcf TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz -C TON_Stratum_Miner_msOS .
+            - run: mkdir TON_Stratum_Miner_raveOS
+            - run: mkdir TON_Stratum_Miner_raveOS/bin
+            - run: cp ./bin/opencl-18 ./bin/cuda-18 ./TON_Stratum_Miner_raveOS/bin
+            - run: cp -r ./config/ ./TON_Stratum_Miner_raveOS
+            - run: cp -r ./data/ ./TON_Stratum_Miner_raveOS
+            - run: cp -r ./integrations/raveos/* ./TON_Stratum_Miner_raveOS
+            - run: cp ./TON-Stratum-Miner/TON-Stratum-Miner ./TON_Stratum_Miner_raveOS
+            - run: chmod 777 ./TON_Stratum_Miner_raveOS/TON-Stratum-Miner
+            - run: cd TON_Stratum_Miner_raveOS && zip -r ../TON_Stratum_Miner_raveOS-${{ steps.get_version.outputs.version-without-v }}.zip ./* && cd -
             - uses: meeDamian/github-release@2.0
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   name: ${{ steps.get_version.outputs.version-without-v }}
                   draft: true
                   gzip: false
-                  files: TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
+                  files: >
+                      TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz
+                      TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
+                      TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
+                      TON_Stratum_Miner_raveOS-${{ steps.get_version.outputs.version-without-v }}.zip
 
     release:
         runs-on: ${{ matrix.os }}
