@@ -90,9 +90,10 @@ Setting up custom miner:
         device, `1` - second, and so on. Examples: `0` for single GPU; `0,3,4` for the first, fourth and fifth GPUs.
     -   `TONPOOL_RIGNAME` - name of this rig to use on the stats screen on the website. Can be any string composed of
         english letter and digits(no spaces, symbols and non-english letters allowed)
-    -   `TONPOOL_BOOST` - _optional_ parameter to set boost factors, as described in [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
+    -   `TONPOOL_BOOST` - _optional_ parameter to set boost factors, as described in
+        [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
         Can be a single number to apply to all GPUs or a comma-separated list of numbers for **each** GPU in
-        `TONPOOL_GPUS`. Default boost factor is `16` for all GPUs
+        `TONPOOL_GPUS`. Default boost factor is `512` for CUDA or `64` for OpenCL
 
     Example:
 
@@ -141,13 +142,19 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
 -   `-F --boost <boost-factors>`: Comma-separated list of boost factors as described in [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
     If a single number is passed it will be applied to all GPUs, otherwise you must pass a boost factor for each device
-    listed in `--gpus`. Defaults to `16`. Examples:
+    listed in `--gpus`. Defaults to `512` for CUDA or `64` for OpenCL. Examples:
     -   `-g 0,1,2 -F 64,32,512`
     -   `-g 0,1,2 -F 512`
 -   `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`. Only
     necessary on multi-GPU systems. Example: `--gpus 0,3,4`
 -   `-p, --pool`: Pool address to connect to. Defaults to `wss://pplns.toncoinpool.io/stratum`
 -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to `default`
+
+Example:
+
+```shell
+$ ./TON-Stratum-Miner -h -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b cuda-20 -F 512 -g 0,1,2 -r myRig
+```
 
 ## Ton Coin Pool endpoints
 

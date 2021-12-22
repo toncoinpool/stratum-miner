@@ -23,7 +23,13 @@ done < <(echo "$CUSTOM_USER_CONFIG")
 
 # set defaults
 TONPOOL_BIN=${TONPOOL_BIN:-"cuda-18"}
-TONPOOL_BOOST=${TONPOOL_BOOST:-"16"}
+
+if [[ "$TONPOOL_BIN" == "cuda-18" ]]; then
+    TONPOOL_BOOST=${TONPOOL_BOOST:-"512"}
+else
+    TONPOOL_BOOST=${TONPOOL_BOOST:-"64"}
+fi
+
 TONPOOL_GPUS=${TONPOOL_GPUS:-"0"}
 TONPOOL_RIGNAME=${TONPOOL_RIGNAME:-"default"}
 

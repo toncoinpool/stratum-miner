@@ -89,7 +89,7 @@
         латинских букв и цифр(никаких других символов и кириллицы)
     -   `TONPOOL_BOOST` - _необязательный_ параметр для указания бустфактора, как описано в [инструкциях pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
         Может быть одним числом, чтобы применить его ко всем видеокартам, или списком чисел, через запятую, для
-        **каждого** GPU в `TONPOOL_GPUS`. По умолчанию используется бустфактор `16` для всех карт
+        **каждого** GPU в `TONPOOL_GPUS`. По умолчанию используется бустфактор `512` для CUDA и `64` для OpenCL
 
     Пример:
 
@@ -139,14 +139,23 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
 -   `-F --boost <boost-factors>`: Список, через запятую, бустфакторов из [pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
     Если передать одно число, оно будет применено ко всем GPU в `--gpus`. Для индивидуальной настройки каждого GPU вы
-    должны перечислить бустфакторы в том же порядке, что в `--gpus` параметре. По умолчанию `16`. Примеры:
+    должны перечислить бустфакторы в том же порядке, что в `--gpus` параметре. По умолчанию `512` для CUDA и `64` для
+    OpenCL. Примеры:
+
     -   `-g 0,1,2 -F 64,32,512`
     -   `-g 0,1,2 -F 512`
+
 -   `-g, --gpus <ids>`: Список, через запятую, идентификаторов GPU девайсов, которые должны использоваться майнером.
     По умолчанию `0`. Указывать стоит только на мульти-GPU системах. Пример: `--gpus 0,3,4`
 -   `-p, --pool`: Адрес пула. По умолчанию `wss://pplns.toncoinpool.io/stratum`
 -   `-r, --rig`: Под каким именем будет видна статистика этого клиента на [toncoinpool.io](https://toncoinpool.io).
     По умолчанию `default`
+
+Пример:
+
+```shell
+$ ./TON-Stratum-Miner -h -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b cuda-20 -F 512 -g 0,1,2 -r myRig
+```
 
 ## Ton Coin Pool endpoints
 

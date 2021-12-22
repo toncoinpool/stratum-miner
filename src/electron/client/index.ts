@@ -71,8 +71,8 @@ class TonPoolClient extends EventEmitter {
         const miners = config.gpus.map((id) => {
             const gpuId = Number.parseInt(id, 10)
             // if user passed -F 256 set all GPUs to 256
-            // if user passed -F 64,32 but has three GPUs, third GPU will use boost factor of 16
-            const defaultBoost = config.boost.length === 1 ? config.boost[0]! : 16
+            // if user passed -F 64,32 but has three GPUs, third GPU will use boost factor of 512 for NVIDIA or 64 for AMD
+            const defaultBoost = config.boost.length === 1 ? config.boost[0]! : /cuda/.test(config.binary) ? 512 : 64
             const boost = config.boost[gpuId] !== undefined ? config.boost[gpuId]! : defaultBoost
             const miner = new Miner(gpuId, config.wallet, config.minerPath, config.dataDir, boost)
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
@@ -83,7 +83,7 @@ class TonPoolClient extends EventEmitter {
 
         log.info(`mining using ${miners.length} gpus`)
 
-        if (config.boost.length > 1 || config.boost[0] !== 16) {
+        if (config.boost.length > 1 || config.boost[0] !== (/cuda/.test(config.binary) ? 512 : 64)) {
             log.info(`using custom boost factors: ${JSON.stringify(miners.map((miner) => miner.boost))}`)
         }
 

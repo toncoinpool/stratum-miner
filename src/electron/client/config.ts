@@ -105,7 +105,7 @@ export default function readConfig(): Config {
     const config = { ...jsonConfig, ...cliConfig }
 
     if (config.boost.length === 0) {
-        config.boost = [16]
+        config.boost = /cuda/.test(config.binary) ? [512] : [64]
     }
     config.boost = config.boost.map((boost) => (boost > 16384 ? 16384 : boost)).map((boost) => (boost < 1 ? 1 : boost))
 
