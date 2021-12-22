@@ -2,7 +2,6 @@
 import EventEmitter from 'events'
 import Client, { StratumError } from './client'
 import { Config } from './config'
-import CustomMiner from './custom-miner'
 import log from './logger'
 import Miner from './miner'
 
@@ -75,13 +74,7 @@ class TonPoolClient extends EventEmitter {
             // if user passed -F 64,32 but has three GPUs, third GPU will use boost factor of 16
             const defaultBoost = config.boost.length === 1 ? config.boost[0]! : 16
             const boost = config.boost[gpuId] !== undefined ? config.boost[gpuId]! : defaultBoost
-            const miner = new (/-custom/.test(config.binary) ? CustomMiner : Miner)(
-                gpuId,
-                config.wallet,
-                config.minerPath,
-                config.dataDir,
-                boost
-            )
+            const miner = new Miner(gpuId, config.wallet, config.minerPath, config.dataDir, boost)
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
             miner.on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
 

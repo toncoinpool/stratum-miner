@@ -24,10 +24,10 @@ indexes=()
 # filter arrays by $TONPOOL_BIN
 cnt=${#busids[@]}
 for (( i=0; i < $cnt; i++)); do
-	if [[ "${brands[$i]}" == "nvidia" && ( "$TONPOOL_BIN" == "pow-miner-cuda-ubuntu-18" || "$TONPOOL_BIN" == "pow-miner-cuda-ubuntu-18-custom" ) ]]; then
+	if [[ "${brands[$i]}" == "nvidia" && "$TONPOOL_BIN" == "cuda-18" ]]; then
 	  indexes+=($i)
 	  continue
-	elif [[ "${brands[$i]}" == "amd" && ( "$TONPOOL_BIN" == "pow-miner-opencl-ubuntu-18" || "$TONPOOL_BIN" == "pow-miner-opencl-ubuntu-18-custom" ) ]]; then
+	elif [[ "${brands[$i]}" == "amd" && "$TONPOOL_BIN" == "opencl-18" ]]; then
 	  indexes+=($i)
 	  continue
 	else # remove arrays data

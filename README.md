@@ -1,7 +1,7 @@
 # Ton Coin Pool stratum-miner
 
-[Ton Coin Pool](https://toncoinpool.io) mining client based on official
-[tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
+[Ton Coin Pool](https://toncoinpool.io) mining client based on our fork of the official miner
+[toncoinpool/pow-miner-gpu](https://github.com/toncoinpool/pow-miner-gpu)
 
 ## Translations
 
@@ -25,9 +25,7 @@ Download the appropriate executable for your platform from
 
 ### GUI Fields
 
--   Mining binary: select `pow-miner-gpu` binary for your system. Each binary has a `Custom` version built from our
-    [fork](https://github.com/toncoinpool/pow-miner-gpu) of the official miners. `Custom` miners are not well-tested but
-    should have higher GPU utilization, especially on high end GPUs. Use at your own risk!
+-   Mining binary: select `pow-miner-gpu` binary for your system
 -   GPUs: GPUs, that you want to use for mining
 -   Wallet address: correct TON Wallet address. `DO NOT USE ANY CRYPTO EXCHANGE SERVICES WALLETS!!!`
 -   Rig name: rig name for statistics on website. Allowed symbols are `latin`, `numeric`, ` `, `-`, `_`, max 24 symbols
@@ -67,19 +65,27 @@ Setting up custom miner:
 
 -   `Miner name` - should be populated automatically once you enter `Installation URL`. If it didn't, enter
     `TON_Stratum_Miner_HiveOS`
--   `Installation URL` - `https://github.com/toncoinpool/stratum-miner/releases/latest/download/TON_Stratum_Miner_HiveOS-<version>.tar.gz`
-    where `<version>` - is **the last** client version(`1.0.5`, `1.1.0`, etc.). Example:
-    `https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.5.tar.gz`
+-   `Installation URL`
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v<version>/TON_Stratum_Miner_HiveOS-<version>.tar.gz
+    ```
+
+    where `<version>` - is the client version(`1.0.5`, `1.1.0`, etc.) from [releases](https://github.com/toncoinpool/stratum-miner/releases)
+    page. Example:
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v1.0.11/TON_Stratum_Miner_HiveOS-1.0.11.tar.gz
+    ```
+
 -   `Hash algorithm` - leave blank
 -   `Wallet and worker template` - **strictly** type `%WAL%` with no spaces
 -   `Pool URL` - `pplns.toncoinpool.io:443/stratum` or it can be any other url since it is not used by the client
 -   `Extra config arguments` - the most important field with client configuration:
 
     -   `TONPOOL_BIN` - one of:
-        -   `pow-miner-cuda-ubuntu-18` - CUDA mining binary
-        -   `pow-miner-cuda-ubuntu-18-custom` - _Experimental_ CUDA mining binary, see [GUI Fields](#gui-fields)
-        -   `pow-miner-opencl-ubuntu-18` - OpenCL mining binary
-        -   `pow-miner-opencl-ubuntu-18-custom` - _Experimental_ OpenCL mining binary, see [GUI Fields](#gui-fields)
+        -   `cuda-18` - CUDA mining binary
+        -   `opencl-18` - OpenCL mining binary
     -   `TONPOOL_GPUS` - comma-separated list of GPU device Ids that should be used by miner where `0` - the first
         device, `1` - second, and so on. Examples: `0` for single GPU; `0,3,4` for the first, fourth and fifth GPUs.
     -   `TONPOOL_RIGNAME` - name of this rig to use on the stats screen on the website. Can be any string composed of
@@ -91,7 +97,7 @@ Setting up custom miner:
     Example:
 
     ```
-    TONPOOL_BIN=pow-miner-cuda-ubuntu-18
+    TONPOOL_BIN=cuda-18
     TONPOOL_GPUS=0,1,2
     TONPOOL_RIGNAME=myHiveRig1
     TONPOOL_BOOST=1024,1024,64
@@ -121,20 +127,17 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
     Linux:
 
-    -   `pow-miner-cuda-ubuntu-18`
-    -   `pow-miner-cuda-ubuntu-20`
-    -   `pow-miner-opencl-ubuntu-18`
-    -   `pow-miner-opencl-ubuntu-20`
+    -   `cuda-18`
+    -   `cuda-20`
+    -   `opencl-18`
+    -   `opencl-20`
 
     Windows:
 
-    -   `pow-miner-cuda.exe`
-    -   `pow-miner-opencl.exe`
+    -   `cuda.exe`
+    -   `opencl.exe`
 
-    Each binary has a `<name>-custom` version as well, see [GUI Fields](#gui-fields). Example:
-    `pow-miner-cuda-custom.exe`
-
-    Defaults to `pow-miner-cuda-ubuntu-20`
+    Defaults to `cuda-20`
 
 -   `-F --boost <boost-factors>`: Comma-separated list of boost factors as described in [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
     If a single number is passed it will be applied to all GPUs, otherwise you must pass a boost factor for each device

@@ -142,19 +142,13 @@
                 { label: 'TON Coin Pool - PPLNS', value: 'wss://pplns.toncoinpool.io/stratum' }
             ])
             const binaries = ref([
-                { label: 'Windows CUDA', value: 'pow-miner-cuda.exe' },
-                { label: 'Windows CUDA Custom', value: 'pow-miner-cuda-custom.exe' },
-                { label: 'Windows OpenCL', value: 'pow-miner-opencl.exe' },
-                { label: 'Windows OpenCL Custom', value: 'pow-miner-opencl-custom.exe' },
-                { label: 'Ubuntu 20.04 CUDA', value: 'pow-miner-cuda-ubuntu-20' },
-                { label: 'Ubuntu 20.04 CUDA Custom', value: 'pow-miner-cuda-ubuntu-20-custom' },
-                { label: 'Ubuntu 18.04 CUDA', value: 'pow-miner-cuda-ubuntu-18' },
-                { label: 'Ubuntu 18.04 CUDA Custom', value: 'pow-miner-cuda-ubuntu-18-custom' },
-                { label: 'Ubuntu 20.04 OpenCL', value: 'pow-miner-opencl-ubuntu-20' },
-                { label: 'Ubuntu 20.04 OpenCL Custom', value: 'pow-miner-opencl-ubuntu-20-custom' },
-                { label: 'Ubuntu 18.04 OpenCL', value: 'pow-miner-opencl-ubuntu-18' },
-                { label: 'Ubuntu 18.04 OpenCL Custom', value: 'pow-miner-opencl-ubuntu-18-custom' },
-                { label: 'Mac OpenCL', value: 'pow-miner-opencl-mac' }
+                { label: 'Windows CUDA', value: 'cuda.exe' },
+                { label: 'Windows OpenCL', value: 'opencl.exe' },
+                { label: 'Ubuntu 20.04 CUDA', value: 'cuda-20' },
+                { label: 'Ubuntu 18.04 CUDA', value: 'cuda-18' },
+                { label: 'Ubuntu 20.04 OpenCL', value: 'opencl-20' },
+                { label: 'Ubuntu 18.04 OpenCL', value: 'opencl-18' },
+                { label: 'Mac OpenCL', value: 'opencl-mac' }
             ])
             const pool = ref('wss://pplns.toncoinpool.io/stratum')
             const binary = ref('')

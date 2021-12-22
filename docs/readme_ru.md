@@ -1,7 +1,7 @@
 # Ton Coin Pool stratum-miner
 
-Клиент для пула [Ton Coin Pool](https://toncoinpool.io) основанный на оффициальном майнере
-[tontechio/pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu)
+Клиент для пула [Ton Coin Pool](https://toncoinpool.io) основанный на нашем форке официального майнера
+[toncoinpool/pow-miner-gpu](https://github.com/toncoinpool/pow-miner-gpu)
 
 ## Перед использованием
 
@@ -22,10 +22,7 @@
 
 ### Настройка графического клиента
 
--   `Select mining binary`: выберите `pow-miner-gpu` майнер, подходящий для вашей системы. У каждого майнера
-    есть `Custom` версия из нашего [форка](https://github.com/toncoinpool/pow-miner-gpu) официального
-    майнера. `Custom` майнеры пока слабо протестированы и могут работать нестабильно, но должны иметь более
-    высокую утилизацию GPU, особенно на мощных видеокартах. Используйте на свой страх и риск.
+-   `Select mining binary`: выберите `pow-miner-gpu` майнер, подходящий для вашей системы
 -   `Select GPUs`: Выберите отдельные GPU, которые будут использоваться для майнинга
 -   `Wallet address`: адрес вашего персонального TON кошелька. `НЕ ИСПОЛЬЗУЙТЕ КОШЕЛЬКИ КРИПТООБМЕННИКОВ!!!`
 -   `Rig name`: имя данного компьютера для отображения в статистике на нашем сайте. Разрешённые символы: `латиница`,
@@ -65,19 +62,27 @@
 
 -   `Miner name` - должен будет подставиться самостоятельно после того, как вы введёте `Installation URL`. Если этого не
     произошло, впишите `TON_Stratum_Miner_HiveOS`(без версии)
--   `Installation URL` - `https://github.com/toncoinpool/stratum-miner/releases/latest/download/TON_Stratum_Miner_HiveOS-<version>.tar.gz`
-    где `<version>` - это **последняя** версия майнера(`1.0.5`, `1.1.0`, и т.д.). Например:
-    `https://github.com/.../TON_Stratum_Miner_HiveOS-1.0.5.tar.gz`
+-   `Installation URL`
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v<version>/TON_Stratum_Miner_HiveOS-<version>.tar.gz
+    ```
+
+    где `<version>` - это желаемая версия майнера(`1.0.5`, `1.1.0`, и т.д.) из [релизов](https://github.com/toncoinpool/stratum-miner/releases).
+    Например:
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v1.0.11/TON_Stratum_Miner_HiveOS-1.0.11.tar.gz
+    ```
+
 -   `Hash algorithm` - оставить пустым
 -   `Wallet and worker template` - писать **строго** `%WAL%` без пробелов
 -   `Pool URL` - `pplns.toncoinpool.io:443/stratum` или любой другой - в майнере никак не используется
 -   `Extra config arguments` - самое главное поле с настройками майнера:
 
     -   `TONPOOL_BIN` - одно из:
-        -   `pow-miner-cuda-ubuntu-18` - CUDA майнер
-        -   `pow-miner-cuda-ubuntu-18-custom` - _Экспериментальный_ CUDA майнер, см. [Настройка графического клиента](#настройка-графического-клиента)
-        -   `pow-miner-opencl-ubuntu-18` - OpenCL майнер
-        -   `pow-miner-opencl-ubuntu-18-custom` - _Экспериментальный_ OpenCL майнер, см. [Настройка графического клиента](#настройка-графического-клиента)
+        -   `cuda-18` - CUDA майнер
+        -   `opencl-18` - OpenCL майнер
     -   `TONPOOL_GPUS` - список, через запятую, айди видеокарт, которые должны использоваться майнером, где `0` - первый
         девайс, `1` - второй, и так далее. Примеры: `0` для одного девайса; `0,3,4` для первого, четвёртого и пятого
     -   `TONPOOL_RIGNAME` - имя рига, для отображения в статистике на сайте, может быть любой **слитной** строкой из
@@ -89,7 +94,7 @@
     Пример:
 
     ```
-    TONPOOL_BIN=pow-miner-cuda-ubuntu-18
+    TONPOOL_BIN=cuda-18
     TONPOOL_GPUS=0,1,2
     TONPOOL_RIGNAME=myHiveRig1
     TONPOOL_BOOST=1024,1024,64
@@ -120,20 +125,17 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
     Linux:
 
-    -   `pow-miner-cuda-ubuntu-18`
-    -   `pow-miner-cuda-ubuntu-20`
-    -   `pow-miner-opencl-ubuntu-18`
-    -   `pow-miner-opencl-ubuntu-20`
+    -   `cuda-18`
+    -   `cuda-20`
+    -   `opencl-18`
+    -   `opencl-20`
 
     Windows:
 
-    -   `pow-miner-cuda.exe`
-    -   `pow-miner-opencl.exe`
+    -   `cuda.exe`
+    -   `opencl.exe`
 
-    У каждого майнера также есть `<имя>-custom` версия, см. [Настройка графического клиента](#настройка-графического-клиента).
-    Например: `pow-miner-cuda-custom.exe`
-
-    По умолчанию `pow-miner-cuda-ubuntu-20`
+    По умолчанию `cuda-20`
 
 -   `-F --boost <boost-factors>`: Список, через запятую, бустфакторов из [pow-miner-gpu](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
     Если передать одно число, оно будет применено ко всем GPU в `--gpus`. Для индивидуальной настройки каждого GPU вы

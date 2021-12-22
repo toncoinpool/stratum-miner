@@ -1,6 +1,5 @@
 import { ChildProcess, execFile } from 'child_process'
 import EventEmitter from 'events'
-import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
 
@@ -197,7 +196,7 @@ class Miner extends EventEmitter {
                 this.solutionPath
             ],
             { timeout: 0 },
-            (error, stdout, stderr) => {
+            (error) => {
                 this.ref = undefined
 
                 if (error && /expire_base [<>]=/.test(error.message)) {
@@ -215,55 +214,47 @@ class Miner extends EventEmitter {
                 if (error && error.code && error.code > 1) {
                     this.emit("error", new Error(`[${this.id}] miner had unexpected exit code ${error.code} with error: ${error.message.trim()}`)) // prettier-ignore
                 }
-                if (error) {
-                    return this.run()
-                }
-
-                if (!stderr.includes('Saving')) {
-                    this.emit("error", new Error(`[${this.id}] unexpected behavior in miner: exit code 0 and failed to match "Saving" in stderr: ${stderr.trim()}`)) // prettier-ignore
-
-                    return this.run()
-                }
-
-                try {
-                    const solution = readFileSync(this.solutionPath, 'hex')
-                    const mined = Cell.fromBoc(solution)
-                    const body = mined[0]?.refs[0]?.bits
-
-                    if (!body) {
-                        throw new Error("Can't read .boc")
-                    }
-
-                    const { expire, rdata1, rseed } = parseMinedBody(body)
-
-                    this.emit('success', [
-                        expire?.toString() || '',
-                        rdata1?.toString() || '',
-                        rseed?.toString() || '',
-                        ''
-                    ])
-                } catch (readFileError) {
-                    this.emit("error", new Error(`[${this.id}] miner failed to read boc file ${this.solutionPath} with error: ${(readFileError as Error).message}`)) // prettier-ignore
-                }
 
                 return this.run()
             }
         )
 
-        this.ref.stderr?.on('data', (line: string) => {
-            if (!/\[ mining in progress, /.test(line)) {
-                return undefined
+        this.ref.stderr?.on('data', (line: string): void => {
+            const [, solution] = line.match(/FOUND BOC: (\w+)/) || []
+
+            if (solution) {
+                try {
+                    const mined = Cell.fromBoc(solution)
+                    const body = mined[0]?.refs[0]?.bits
+
+                    if (!body) {
+                        return void this.emit('error', new Error('parsed invalid boc'))
+                    }
+
+                    const { expire, rdata1, rseed } = parseMinedBody(body)
+
+                    return void this.emit('success', [
+                        expire?.toString() || '',
+                        rdata1?.toString() || '',
+                        rseed?.toString() || '',
+                        ''
+                    ])
+                } catch (error) {
+                    return void this.emit('error', new Error(`error parsing boc: ${(error as Error).message}`))
+                }
             }
 
-            const [, hashrate] = line.match(/instant speed: (\d+\.?\d*) Mhash\/s/) || []
+            if (/\[ mining in progress, /.test(line)) {
+                const [, hashrate] = line.match(/instant speed: (\d+\.?\d*) Mhash\/s/) || []
 
-            if (!hashrate) {
-                return undefined
+                if (!hashrate) {
+                    return undefined
+                }
+
+                const value = BigInt(Math.round(Number.parseFloat(hashrate))) * BigInt(1e6)
+
+                return void this.emit('hashrate', value.toString())
             }
-
-            const value = BigInt(Math.round(Number.parseFloat(hashrate))) * BigInt(1e6)
-
-            return this.emit('hashrate', value.toString())
         })
     }
 

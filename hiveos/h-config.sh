@@ -22,7 +22,7 @@ IFS="="; while read -r key value; do
 done < <(echo "$CUSTOM_USER_CONFIG")
 
 # set defaults
-TONPOOL_BIN=${TONPOOL_BIN:-"pow-miner-cuda-ubuntu-18"}
+TONPOOL_BIN=${TONPOOL_BIN:-"cuda-18"}
 TONPOOL_BOOST=${TONPOOL_BOOST:-"16"}
 TONPOOL_GPUS=${TONPOOL_GPUS:-"0"}
 TONPOOL_RIGNAME=${TONPOOL_RIGNAME:-"default"}

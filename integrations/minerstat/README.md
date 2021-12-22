@@ -6,9 +6,19 @@ Following the official instructions on [adding new custom mining client](https:/
 fill in the fields:
 
 -   `Name` - `TON-STRATUM-MINER`
--   `Package URL` - `https://github.com/toncoinpool/stratum-miner/releases/download/v<version>/TON_Stratum_Miner_msOS-<version>.tar.gz`
+-   `Package URL`
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v<version>/TON_Stratum_Miner_msOS-<version>.tar.gz
+    ```
+
     where `<version>` - is the client version(`1.0.5`, `1.1.0`, etc.) from [releases](https://github.com/toncoinpool/stratum-miner/releases)
-    page. Example: `https://github.com/toncoinpool/stratum-miner/releases/download/v1.0.10/TON_Stratum_Miner_msOS-1.0.10.tar.gz`
+    page. Example:
+
+    ```
+    https://github.com/toncoinpool/stratum-miner/releases/download/v1.0.10/TON_Stratum_Miner_msOS-1.0.10.tar.gz
+    ```
+
 -   `Executable file name` - `TON-Stratum-Miner`
 -   `Client config type` - `Arguments`
 -   `Client args/config` - This is a string of client's command-line arguments in the following form:
@@ -21,12 +31,10 @@ fill in the fields:
     -   `-w, --wallet`: _Required_. Your TON wallet's address
     -   `-b, --bin <name>`: Name of the miner binary. Can be one of:
 
-        -   `pow-miner-cuda-ubuntu-18` - CUDA miner
-        -   `pow-miner-cuda-ubuntu-18-custom` - CUDA miner with better GPU utilization
-        -   `pow-miner-opencl-ubuntu-18` - OpenCL miner
-        -   `pow-miner-opencl-ubuntu-18-custom` - OpenCL miner with better GPU utilization
+        -   `cuda-18` - CUDA miner
+        -   `opencl-18` - OpenCL miner
 
-        Defaults to `pow-miner-cuda-ubuntu-18`
+        Defaults to `cuda-18`
 
     -   `-F --boost <boost-factors>`: Comma-separated list of boost factors as described in
         [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md).
@@ -42,7 +50,7 @@ fill in the fields:
 
     Full example:
 
-    `--integration msOS -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b pow-miner-cuda-ubuntu-18-custom -F 512 -g 0,1,2 -r msOSrig`
+    `--integration msOS -w EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W -b cuda-18 -F 512 -g 0,1,2 -r msOSrig`
 
 -   `Extra args` - you can add `| tee log.txt` here to create a log file in `/home/minerstat/minerstat-os/clients/<miner-name>/`
     to help with troubleshooting in case of any errors.
