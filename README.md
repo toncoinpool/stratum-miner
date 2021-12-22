@@ -35,6 +35,10 @@ Download the appropriate executable for your platform from
 
 Instructions can be found [here](integrations/minerstat/README.md)
 
+### RaveOS integration
+
+Instructions can be found [here](integrations/raveos/README.md)
+
 ### HiveOS integration
 
 This instructions are targeted at users experienced with HiveOS

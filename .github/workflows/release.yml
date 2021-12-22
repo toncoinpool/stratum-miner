@@ -55,7 +55,6 @@ jobs:
             - run: mkdir TON_Stratum_Miner_raveOS
             - run: mkdir TON_Stratum_Miner_raveOS/bin
             - run: cp ./bin/opencl-18 ./bin/cuda-18 ./TON_Stratum_Miner_raveOS/bin
-            - run: cp -r ./config/ ./TON_Stratum_Miner_raveOS
             - run: cp -r ./data/ ./TON_Stratum_Miner_raveOS
             - run: cp -r ./integrations/raveos/* ./TON_Stratum_Miner_raveOS
             - run: cp ./TON-Stratum-Miner/TON-Stratum-Miner ./TON_Stratum_Miner_raveOS

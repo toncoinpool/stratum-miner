@@ -1,14 +1,18 @@
 # Ton Coin Pool RaveOS integration
 
-[Ton Coin Pool](https://toncoinpool.io) client setup on [RaveOS](https://raveos.com)
+[Ton Coin Pool](https://toncoinpool.io) custom miner setup on [RaveOS](https://raveos.com)
 
-The only setup step necessary to start mining is `Additional command line arguments` field:
+Download the latest `TON_Stratum_Miner_raveOS-<version>.zip` from [releases](https://github.com/toncoinpool/stratum-miner/releases)
+page
+
+If you ever need a pool URL use `pplns.toncoinpool.io:443/stratum`
+
+Miner is configured via `Additional command line arguments` box. All fields are optional:
 
 ```
---wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--gpus <ids>] [--rig <name>]
+[--bin <name>] [--boost <boost-factors>] [--gpus <ids>] [--rig <name>]
 ```
 
--   `-w, --wallet`: _Required_. Your TON wallet's address
 -   `-b, --bin <name>`: Name of the miner binary. Can be one of:
 
     -   `cuda-18` - CUDA miner

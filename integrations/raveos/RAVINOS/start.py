@@ -3,13 +3,14 @@ import os
 import ravinos
 
 cfg = ravinos.get_config()
-pool = cfg['coins'][0]['pools'][0]
+
+wallet = cfg['coins'][0]['pools'][0]['user']
 
 args = ' '.join(cfg['args'])
 
-if len(args) == 0:
-    ravinos.error('--wallet argument is missing')
+cmd = os.path.join(cfg['miner_dir'], 'TON-Stratum-Miner') + ' --integration raveos -w %s' % wallet
 
-cmd = os.path.join(cfg['miner_dir'], 'TON-Stratum-Miner') + ' --integration raveos ' + args
+if len(args) > 0:
+    cmd += ' ' + args
 
 ravinos.run(cmd)
