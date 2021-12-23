@@ -34,7 +34,7 @@
 
 ### RaveOS интеграция
 
-Смотрите инструкцию [здесь](../integrations/raveos/README.md)
+Смотрите инструкцию [здесь](../integrations/raveos/README_RU.md)
 
 ### HiveOS интеграция
 
