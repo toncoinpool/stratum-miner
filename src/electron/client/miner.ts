@@ -196,7 +196,7 @@ class Miner extends EventEmitter {
                 this.solutionPath
             ],
             { timeout: 0 },
-            (error) => {
+            (error, stdout, stderr) => {
                 this.ref = undefined
 
                 if (error && /expire_base [<>]=/.test(error.message)) {
@@ -211,8 +211,8 @@ class Miner extends EventEmitter {
 
                     return undefined // no reason to restart the miner, we'll get the same error
                 }
-                if (error && error.code && error.code > 1) {
-                    this.emit("error", new Error(`[${this.id}] miner had unexpected exit code ${error.code} with error: ${error.message.trim()}`)) // prettier-ignore
+                if (error && (error.code || error.signal === 'SIGABRT')) {
+                    this.emit("error", new Error(`[${this.id}] miner error ${error.code || 'null'} ${error.signal || 'null'}:\n${stderr.trim()}`)) // prettier-ignore
                 }
 
                 return this.run()
