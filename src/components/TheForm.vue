@@ -170,7 +170,7 @@
                     return new BigDecimal(el.hashrate).add(acc)
                 }, new BigDecimal('0'))
 
-                return formatHashes(reduced.div(hashrates.value.length).toFixed(0))
+                return formatHashes(reduced.toFixed(0))
             })
 
             const shares = reactive({
