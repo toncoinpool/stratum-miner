@@ -9,7 +9,7 @@ const baseConfig = readConfig()
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-        height: 480,
+        height: process.platform === 'win32' ? 490 : 480,
         width: 350,
         resizable: false,
         maximizable: false,

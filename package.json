@@ -1,9 +1,9 @@
 {
-    "private": true,
     "name": "ton-pool-client",
     "version": "1.0.12",
     "author": "Telezhka",
-    "license": "ISC",
+    "license": "MIT",
+    "description": "TON pool client",
     "main": "dist/electron/index.js",
     "repository": {
         "type": "git",
