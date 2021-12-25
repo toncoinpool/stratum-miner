@@ -26,19 +26,19 @@ interface Client {
     emit(event: 'close', code: number, reason: string): boolean
     emit(event: 'error', error: Error): boolean
     emit(event: 'message', message: Message): boolean
-    emit(event: 'open'): boolean
+    emit(event: 'open', complexity: string): boolean
     emit(event: 'reconnect'): boolean
 
     on(event: 'close', listener: (code: number, reason: string) => void): this
     on(event: 'error', listener: (error: Error) => void): this
     on(event: 'message', listener: (message: Message) => void): this
-    on(event: 'open', listener: () => void): this
+    on(event: 'open', listener: (complexity: string) => void): this
     on(event: 'reconnect', listener: () => void): this
 
     once(event: 'close', listener: (code: number, reason: string) => void): this
     once(event: 'error', listener: (error: Error) => void): this
     once(event: 'message', listener: (message: Message) => void): this
-    once(event: 'open', listener: () => void): this
+    once(event: 'open', listener: (complexity: string) => void): this
     once(event: 'reconnect', listener: () => void): this
 }
 
@@ -65,7 +65,7 @@ class Client extends EventEmitter {
             .on('close', (code, reason) => this.onClose(code, reason))
             .on('error', (error) => this.onError(error))
             .on('message', (data) => this.onMessage(data))
-            .on('open', () => this.onOpen())
+            .on('open', () => void this.onOpen())
     }
 
     destroy() {
@@ -109,7 +109,7 @@ class Client extends EventEmitter {
                     .on('close', (code, reason) => this.onClose(code, reason))
                     .on('error', (error) => this.onError(error))
                     .on('message', (data) => this.onMessage(data))
-                    .on('open', () => this.onOpen())
+                    .on('open', () => void this.onOpen())
             }
         }, this.reconnectInterval)
 
@@ -135,8 +135,19 @@ class Client extends EventEmitter {
         return void this.emit('message', message)
     }
 
-    private onOpen() {
-        this.emit('open')
+    private async onOpen() {
+        try {
+            const [, complexity] = await this.subscribe()
+            log.debug('connection subscribed')
+
+            await this.authorize()
+            log.debug('connection authorized')
+
+            this.emit('open', complexity)
+        } catch (error) {
+            this.emit('error', new Error(`${(error as Error).message}`))
+            this.ws.terminate()
+        }
     }
 
     private async request(method: string, params: unknown) {
@@ -168,7 +179,7 @@ class Client extends EventEmitter {
             }
 
             this.on('message', onResponse)
-            const timeout = setTimeout(onTimeout, 5000)
+            const timeout = setTimeout(onTimeout, 10000)
         })
     }
 }
