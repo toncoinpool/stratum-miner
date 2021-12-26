@@ -100,35 +100,12 @@ class TonPoolClient extends EventEmitter {
                 miners.forEach((miner) => miner.stop())
             })
             .on('error', ({ message }) => onError(new Error(`connection error: ${message}`)))
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            .on('open', async () => {
+            .on('open', (complexity) => {
                 reconnecting = false
-                miners.forEach((miner) => miner.start())
                 log.info('connection established')
 
-                // TODO: move subscribe() and authorize() inside the Client
-                try {
-                    const result = await this.client!.subscribe()
-                    log.debug('connection subscribed')
-                    miners.forEach((miner) => miner.setComplexity(result[1]))
-                } catch (error) {
-                    onError(new Error(`connection error: ${(error as Error).message}`))
-
-                    if (/server did not respond/.test((error as Error).message) === false) {
-                        return this.stop()
-                    }
-                }
-
-                try {
-                    await this.client!.authorize()
-                    log.debug('connection authorized')
-                } catch (error) {
-                    onError(new Error(`connection error: ${(error as Error).message}`))
-
-                    if (/server did not respond/.test((error as Error).message) === false) {
-                        return this.stop()
-                    }
-                }
+                miners.forEach((miner) => miner.start())
+                miners.forEach((miner) => miner.setComplexity(complexity))
 
                 this.state = this.CONNECTED
                 this.emit('connect')

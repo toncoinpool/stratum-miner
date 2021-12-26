@@ -1,6 +1,6 @@
 {
     "name": "ton-pool-client",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "author": "Telezhka",
     "license": "MIT",
     "description": "TON pool client",
