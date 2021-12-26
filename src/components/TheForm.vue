@@ -151,11 +151,11 @@
                 { label: 'Mac OpenCL', value: 'opencl-mac' }
             ])
             const pool = ref('wss://pplns.toncoinpool.io/stratum')
-            const binary = ref('')
+            const binary = ref(localStorage.getItem("binary") ?? '')
             const devices = ref<{ label: string, value: number }[]>([])
             const gpus = ref([])
-            const wallet = ref('')
-            const rig = ref('')
+            const wallet = ref(localStorage.getItem("wallet") ?? '')
+            const rig = ref(localStorage.getItem("rig") ?? '')
 
             const isMiningStarted = ref(false)
             const isLoadingGpus = ref(false)
@@ -207,12 +207,17 @@
                 const config: MiningConfig = {
                     pool: pool.value,
                     binary: binary.value,
-                    gpus: gpus.value.map(el => el),
+                    gpus: gpus.value.map((el: any) => el),
                     wallet: wallet.value,
                     rig: rig.value
                 }
 
                 window.ipcRenderer.send('miningStart', config)
+
+                localStorage.setItem("binary", config.binary);
+                localStorage.setItem("gpus", JSON.stringify(config.gpus));
+                localStorage.setItem("wallet", config.wallet);
+                localStorage.setItem("rig", config.rig);
             }
 
             const miningStop = () => {
@@ -226,6 +231,7 @@
 
                 window.ipcRenderer.send('getDevices', binary)
             }
+            if (localStorage.getItem("gpus")) getDevices(localStorage.getItem("binary") ?? '')
 
             const clearError = () => {
                 isError.value = false
@@ -265,6 +271,7 @@
                 }
 
                 devices.value = data.map((el, i) => ({ label: el, value: i }))
+                if (localStorage.getItem("gpus")) gpus.value = JSON.parse(localStorage.getItem("gpus") ?? '')
 
                 return undefined
             })
