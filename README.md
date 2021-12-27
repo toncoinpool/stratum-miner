@@ -21,9 +21,9 @@ Currently only Nvidia and AMD GPUs are supported
 Download the appropriate executable for your platform from
 [Releases](https://github.com/toncoinpool/stratum-miner/releases) page:
 
--   Windows: file with `.exe` extension
+-   Windows: file with `.exe` extension or `win-headless.zip`(recommended) archive containing CLI-only binary
 -   macOS: `.zip` archive containing `.app` file. Last version with macOS support was `1.0.13`
--   Linux: `.AppImage` file with GUI or `linux-headless.tar.gz` archive containing CLI-only binary
+-   Linux: `.AppImage` file with GUI or `linux-headless.tar.gz`(recommended) archive containing CLI-only binary
 
 ### GUI Fields
 
@@ -47,13 +47,20 @@ Instructions can be found [here](integrations/hiveos/README.md)
 
 ### Headless
 
-You can run the client without the GUI directly from the command line:
+You can run the client from the command-line on both linux and windows. Minimum required windows version is 8.1
+
+Linux:
 
 ```shell
-$ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--pool <uri>] [--rig <name>]
+$ ./TON-Stratum-Miner --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
 ```
 
--   `-h, --headless`: _Required_. Pass this flag to not open the client's GUI window
+Windows:
+
+```shell
+TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
+```
+
 -   `-w, --wallet`: _Required_. Your TON wallet's address
 -   `-b, --bin <name>`: Name of the miner binary. Can be specified to use only Nvidia or only AMD GPUs. Can be one of:
 
@@ -73,9 +80,8 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 
 -   `-F --boost <boost-factors>`: configure boost factors
     ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
-    Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs. The
-    only way to find device ids is to run the miner first and check the output. Defaults to `512` for Nvidia or `64` for
-    AMD.
+    Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs. To
+    list device ids run the client without `--wallet` argument. Defaults to `512` for Nvidia or `64` for AMD.
 
     Given the following device list in miner logs:
 
@@ -90,6 +96,8 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
     -   `--boost 1:0:256` - will use the default value of `512` for 3080 and `256` for 6600
     -   `--boost 0:1024,1:0:128` - will use `1024` for 3080 and `128` for 6600
 
+-   `--exclude-gpus <ids>`: disable mining on specific GPUs. A comma-separated list of device ids. To find id of a
+    specific device run the client without `--wallet` argument. Example: `--exclude-gpus 0,1,1:0,1:1`
 -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to `default`
 
 ## Ton Coin Pool endpoints

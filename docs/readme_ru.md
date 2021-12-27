@@ -17,10 +17,11 @@
 
 Загрузите версию клиента, подходящую вам, со страницы [релизов](https://github.com/toncoinpool/stratum-miner/releases):
 
--   Windows: файл с `.exe` расширением
+-   Windows: файл с `.exe` расширением или `win-headless.zip`(рекомендуется) архив содержащий файл, запускаемый только
+    из командной строки
 -   macOS: `.zip` архив содержащий `.app` файл. Последняя версия с поддержкой macOS была `1.0.13`
--   Linux: `.AppImage` файл с графическим интерфейсом или `linux-headless.tar.gz` архив содержащий файл, запускаемый
-    только из командной строки
+-   Linux: `.AppImage` файл с графическим интерфейсом или `linux-headless.tar.gz`(рекомендуется) архив содержащий файл,
+    запускаемый только из командной строки
 
 ### Настройка графического клиента
 
@@ -44,13 +45,20 @@
 
 ### Headless
 
-Вы можете запустить клиент без графического интерфейса напрямую из командной строки:
+Вы можете запустить клиент из командной строки на linux и windows. Минимальная поддерживаемая версия windows: 8.1
+
+Linux:
 
 ```shell
-$ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--pool <uri>] [--rig <name>]
+$ ./TON-Stratum-Miner --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
 ```
 
--   `-h, --headless`: _Обязательно_. Данный флаг предотвращает открытие окна графического интерфейса
+Windows:
+
+```shell
+TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
+```
+
 -   `-w, --wallet`: _Обязательно_. Адрес вашего TON кошелька
 -   `-b, --bin <name>`: Имя майнера. Позволяет использовать только Nvidia(`cuda`) или только AMD(`opencl`) карты. Одно из:
 
@@ -71,8 +79,8 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
 -   `-F --boost <boost-factors>`: указание бустфактора
     ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
     Может быть одним числом, чтобы применить его ко всем видеокартам, или списком чисел, через запятую вида
-    `<id>:<boost>,<id>:<boost>,...`. Для получения списка айди девайсов необходимо запустить майнер и посмотреть в
-    начало его логов. По умолчанию используется бустфактор `512` для Nvidia и `64` для AMD
+    `<id>:<boost>,<id>:<boost>,...`. Для получения списка айди девайсов запустите клиент без `--wallet` аргумента. По
+    умолчанию используется бустфактор `512` для Nvidia и `64` для AMD
 
     При следующем списке девайсов в логах майнера:
 
@@ -87,6 +95,9 @@ $ ./TON-Stratum-Miner --headless --wallet <your-wallet-address> [--bin <name>] [
     -   `--boost 1:0:256` - будет использовать значение по умолчанию `512` для 3080 и `256` для 6600
     -   `--boost 0:1024,1:0:128` - будет использовать `1024` для 3080 и `128` для 6600
 
+-   `--exclude-gpus <ids>`: не использовать отдельные GPU в майнинге. Список, через запятую, айди девайсов. Для того,
+    чтобы узнать айди конкретного девайса запустите клиент без `--wallet` аргумента. Пример:
+    `--exclude-gpus 0,1,1:0,1:1`
 -   `-r, --rig`: Под каким именем будет видна статистика этого клиента на [toncoinpool.io](https://toncoinpool.io).
     По умолчанию `default`
 
