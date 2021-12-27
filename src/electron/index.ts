@@ -9,7 +9,7 @@ const baseConfig = readConfig()
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-        height: process.platform === 'win32' ? 492 : 480,
+        height: 480,
         width: 350,
         resizable: false,
         maximizable: false,
@@ -17,6 +17,7 @@ const createWindow = () => {
             preload: resolve(__dirname, 'preload.js')
         }
     })
+    mainWindow.setMenuBarVisibility(false)
 
     void mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
 

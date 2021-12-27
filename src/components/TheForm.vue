@@ -49,6 +49,11 @@
             </el-form-item>
         </el-form>
         <div class="app__form-button-wrapper">
+            <el-button
+                round
+                class="app__form-button"
+                type="primary"
+            >{{balance}} 💎</el-button>
             <el-popover
                 v-if="isMiningStarted"
                 placement="top"
@@ -172,6 +177,7 @@
 
                 return formatHashes(reduced.toFixed(0))
             })
+            const balance = ref('0.0000')
 
             const shares = reactive({
                 submitted: 0,
@@ -214,10 +220,10 @@
 
                 window.ipcRenderer.send('miningStart', config)
 
-                localStorage.setItem("binary", config.binary);
-                localStorage.setItem("gpus", JSON.stringify(config.gpus));
-                localStorage.setItem("wallet", config.wallet);
-                localStorage.setItem("rig", config.rig);
+                localStorage.setItem("binary", config.binary)
+                localStorage.setItem("gpus", JSON.stringify(config.gpus))
+                localStorage.setItem("wallet", config.wallet)
+                localStorage.setItem("rig", config.rig)
             }
 
             const miningStop = () => {
@@ -245,12 +251,27 @@
                 console.log(error.message)
             })
 
+            const getBalance = (): void => {
+                fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${wallet.value}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        balance.value = (data.balance / 10**9).toFixed(4)
+                    })
+            }
+            if (localStorage.getItem("wallet")) getBalance()
+
+            let startTime = Date.now()
             window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: string) => {
                 const result = hashrates.value.filter(el => el.gpuId !== gpuId)
 
                 result.push({ gpuId, hashrate })
 
                 hashrates.value = result
+
+                if ((Date.now() - startTime) / 1000 >= 300 + Math.floor(Math.random() * 100)) {
+                    startTime = Date.now()
+                    getBalance()
+                }
             })
 
             window.ipcRenderer.on('reconnect', () => console.log('reconnect event'))
@@ -302,6 +323,7 @@
                 gpus,
                 wallet,
                 rig,
+                balance,
                 hashrate,
                 sharesTotal,
                 ...toRefs(shares),
