@@ -108,13 +108,15 @@ class TonPoolClient extends EventEmitter {
 
                 miners.forEach((miner) => miner.stop())
             })
+            .on('complexity', (complexity) => {
+                miners.forEach((miner) => miner.setComplexity(complexity))
+            })
             .on('error', ({ message }) => onError(new Error(`connection error: ${message}`)))
-            .on('open', (complexity) => {
+            .on('open', () => {
                 reconnecting = false
                 log.info('connection established')
 
                 miners.forEach((miner) => miner.start())
-                miners.forEach((miner) => miner.setComplexity(complexity))
 
                 this.state = this.CONNECTED
                 this.emit('connect')

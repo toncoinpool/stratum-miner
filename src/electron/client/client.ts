@@ -24,21 +24,24 @@ export class StratumError extends Error {
 
 interface Client {
     emit(event: 'close', code: number, reason: string): boolean
+    emit(event: 'complexity', complexity: string): boolean
     emit(event: 'error', error: Error): boolean
     emit(event: 'message', message: Message): boolean
-    emit(event: 'open', complexity: string): boolean
+    emit(event: 'open'): boolean
     emit(event: 'reconnect'): boolean
 
     on(event: 'close', listener: (code: number, reason: string) => void): this
+    on(event: 'complexity', listener: (complexity: string) => void): this
     on(event: 'error', listener: (error: Error) => void): this
     on(event: 'message', listener: (message: Message) => void): this
-    on(event: 'open', listener: (complexity: string) => void): this
+    on(event: 'open', listener: () => void): this
     on(event: 'reconnect', listener: () => void): this
 
     once(event: 'close', listener: (code: number, reason: string) => void): this
+    once(event: 'complexity', listener: (complexity: string) => void): this
     once(event: 'error', listener: (error: Error) => void): this
     once(event: 'message', listener: (message: Message) => void): this
-    once(event: 'open', listener: (complexity: string) => void): this
+    once(event: 'open', listener: () => void): this
     once(event: 'reconnect', listener: () => void): this
 }
 
@@ -139,11 +142,12 @@ class Client extends EventEmitter {
         try {
             const [, complexity] = await this.subscribe()
             log.debug('connection subscribed')
+            this.emit('complexity', complexity)
 
             await this.authorize()
             log.debug('connection authorized')
 
-            this.emit('open', complexity)
+            this.emit('open')
         } catch (error) {
             this.emit('error', new Error(`${(error as Error).message}`))
             this.ws.terminate()
