@@ -1,45 +1,82 @@
 import { writeFile } from 'fs'
 import { resolve } from 'path'
-import { env } from 'process'
 import readConfig from './config'
 import log from './logger'
+import readGPUs from './read-gpus'
 import TonPoolClient from '.'
 
-const config = readConfig()
+void (async function main() {
+    const config = readConfig()
+    const gpus = await readGPUs(config.baseBinaryPath, config.boost, config.excludeGPUs, config.binary)
+    TonPoolClient.on('stop', () => process.exit())
+    TonPoolClient.start(config, gpus)
 
-TonPoolClient.start(config)
-TonPoolClient.on('stop', () => process.exit())
+    if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
+        const started = Math.floor(Date.now() / 1000)
+        const statsPath = resolve(config.dataDir, 'stats.json')
 
-if (env.TONPOOL_IS_IN_HIVE || ['msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
-    const started = Math.floor(Date.now() / 1000)
-    const statsPath = resolve(config.dataDir, 'stats.json')
-    const hashrates = new Map(config.gpus.map((id) => [id, 0]))
-    let acceptedShares = 0
-    let rejectedShares = 0
+        const defaultStats = gpus.map((gpu) => {
+            const key = gpu.id
+            const value = {
+                accepted: 0,
+                duplicate: 0,
+                hashrate: 0,
+                id: gpu.id,
+                invalid: 0,
+                stale: 0,
+                type: gpu.type
+            }
 
-    TonPoolClient.on('hashrate', (gpuId, hashrate) => hashrates.set(gpuId, Number(BigInt(hashrate) / BigInt(1e6))))
-    TonPoolClient.on('submit', () => acceptedShares++)
-    TonPoolClient.on('submitDuplicate', () => rejectedShares++)
-    TonPoolClient.on('submitInvalid', () => rejectedShares++)
-    TonPoolClient.on('submitStale', () => rejectedShares++)
+            return [key, value] as const
+        })
 
-    setInterval(() => {
-        const hs = [...hashrates.entries()]
-            .map<[number, number]>((arr) => [Number.parseInt(arr[0]), arr[1]])
-            .sort((a, b) => a[0] - b[0])
-            .map(([, hashrate]) => hashrate)
-        const khs = hs.reduce((acc, current) => acc + current, 0) * 1000
-        const stats = {
-            ar: [acceptedShares, rejectedShares],
-            hs,
-            khs,
-            uptime: Math.floor(Date.now() / 1000) - started
+        const stats = new Map(defaultStats)
+
+        TonPoolClient.on('hashrate', (id, hashrate) => {
+            const stat = stats.get(id)
+            if (stat) stat.hashrate = Number(BigInt(hashrate) / BigInt(1e6))
+        })
+        TonPoolClient.on('submit', (id) => {
+            const stat = stats.get(id)
+            if (stat) stat.accepted++
+        })
+        TonPoolClient.on('submitDuplicate', (id) => {
+            const stat = stats.get(id)
+            if (stat) stat.duplicate++
+        })
+        TonPoolClient.on('submitInvalid', (id) => {
+            const stat = stats.get(id)
+            if (stat) stat.invalid++
+        })
+        TonPoolClient.on('submitStale', (id) => {
+            const stat = stats.get(id)
+            if (stat) stat.stale++
+        })
+
+        const writeStats = () => {
+            const hs = [...stats.values()].map(({ hashrate }) => hashrate)
+            const khs = hs.reduce((acc, current) => acc + current, 0) * 1000
+            const acceptedTotal = [...stats.values()].reduce((acc, { accepted }) => acc + accepted, 0)
+            const rejectedTotal = [...stats.values()].reduce(
+                (acc, { duplicate, invalid, stale }) => acc + duplicate + invalid + stale,
+                0
+            )
+            const json = {
+                ar: [acceptedTotal, rejectedTotal],
+                gpus: [...stats.values()],
+                hs,
+                khs,
+                uptime: Math.floor(Date.now() / 1000) - started
+            }
+
+            writeFile(statsPath, JSON.stringify(json), (error) => {
+                if (error) {
+                    log.error(`failed to write stats.json: ${error.message}`)
+                }
+            })
         }
 
-        writeFile(statsPath, JSON.stringify(stats), (error) => {
-            if (error) {
-                log.error(`failed to write stats.json: ${error.message}`)
-            }
-        })
-    }, 10000).unref()
-}
+        writeStats()
+        setInterval(() => writeStats(), 10000).unref()
+    }
+})().catch((error: Error) => log.error(`bin main error: ${error.message}`))

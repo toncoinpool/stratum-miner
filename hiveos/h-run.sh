@@ -11,7 +11,7 @@ fi
 
 TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
 TONPOOL_BOOST=$(jq -r ".boost" $TONPOOL_HIVE_CONF)
-TONPOOL_GPUS=$(jq -r ".gpus" $TONPOOL_HIVE_CONF)
+TONPOOL_EXCLUDE_GPUS=$(jq -r ".excludeGPUs" $TONPOOL_HIVE_CONF)
 TONPOOL_RIGNAME=$(jq -r ".rig" $TONPOOL_HIVE_CONF)
 WALLET_ADR=$(jq -r ".wallet" $TONPOOL_HIVE_CONF)
 
@@ -20,11 +20,11 @@ source h-manifest.conf
 CUSTOM_LOG_BASEDIR=`dirname "$CUSTOM_LOG_BASENAME"`
 [[ ! -d $CUSTOM_LOG_BASEDIR ]] && mkdir -p $CUSTOM_LOG_BASEDIR
 
-export TONPOOL_IS_IN_HIVE=1
-
 $TONPOOL_EXECUTABLE \
-    -w $WALLET_ADR \
-    -b $TONPOOL_BIN \
-    -F $TONPOOL_BOOST \
-    -g $TONPOOL_GPUS \
-    -r $TONPOOL_RIGNAME 2>&1 | tee --append $CUSTOM_LOG_BASENAME.log
+    "--integration hiveos" \
+    ${WALLET_ADR:+"-w $WALLET_ADR"} \
+    ${TONPOOL_BIN:+"-b $TONPOOL_BIN"} \
+    ${TONPOOL_BOOST:+"-F $TONPOOL_BOOST"} \
+    ${TONPOOL_EXCLUDE_GPUS:+"--exclude-gpus $TONPOOL_EXCLUDE_GPUS"} \
+    ${TONPOOL_RIGNAME:+"-r $TONPOOL_RIGNAME"} \
+    2>&1 | tee --append $CUSTOM_LOG_BASENAME.log

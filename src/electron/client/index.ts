@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import EventEmitter from 'events'
+import { nextTick } from 'process'
 import Client, { StratumError } from './client'
 import { Config } from './config'
 import log from './logger'
 import Miner from './miner'
+import { GPU } from './read-gpus'
 
 interface TonPoolClient {
     emit(event: 'connect'): boolean
@@ -11,30 +13,30 @@ interface TonPoolClient {
     emit(event: 'hashrate', gpuId: string, hashrate: string): boolean
     emit(event: 'reconnect'): boolean
     emit(event: 'stop'): boolean
-    emit(event: 'submit'): boolean
-    emit(event: 'submitDuplicate'): boolean
-    emit(event: 'submitInvalid'): boolean
-    emit(event: 'submitStale'): boolean
+    emit(event: 'submit', gpuId: string): boolean
+    emit(event: 'submitDuplicate', gpuId: string): boolean
+    emit(event: 'submitInvalid', gpuId: string): boolean
+    emit(event: 'submitStale', gpuId: string): boolean
 
     on(event: 'connect', listener: () => void): this
     on(event: 'error', listener: (error: Error) => void): this
     on(event: 'hashrate', listener: (gpuId: string, hashrate: string) => void): this
     on(event: 'reconnect', listener: () => void): this
     on(event: 'stop', listener: () => void): this
-    on(event: 'submit', listener: () => void): this
-    on(event: 'submitDuplicate', listener: () => void): this
-    on(event: 'submitInvalid', listener: () => void): this
-    on(event: 'submitStale', listener: () => void): this
+    on(event: 'submit', listener: (gpuId: string) => void): this
+    on(event: 'submitDuplicate', listener: (gpuId: string) => void): this
+    on(event: 'submitInvalid', listener: (gpuId: string) => void): this
+    on(event: 'submitStale', listener: (gpuId: string) => void): this
 
     once(event: 'connect', listener: () => void): this
     once(event: 'error', listener: (error: Error) => void): this
     once(event: 'hashrate', listener: (gpuId: string, hashrate: string) => void): this
     once(event: 'reconnect', listener: () => void): this
     once(event: 'stop', listener: () => void): this
-    once(event: 'submit', listener: () => void): this
-    once(event: 'submitDuplicate', listener: () => void): this
-    once(event: 'submitInvalid', listener: () => void): this
-    once(event: 'submitStale', listener: () => void): this
+    once(event: 'submit', listener: (gpuId: string) => void): this
+    once(event: 'submitDuplicate', listener: (gpuId: string) => void): this
+    once(event: 'submitInvalid', listener: (gpuId: string) => void): this
+    once(event: 'submitStale', listener: (gpuId: string) => void): this
 }
 
 class TonPoolClient extends EventEmitter {
@@ -56,8 +58,26 @@ class TonPoolClient extends EventEmitter {
         super()
     }
 
-    start(config: Config): void {
-        log.info(`starting client ${config.version} using ${config.binary}...`)
+    start(config: Config, gpus: GPU[]): void {
+        log.info(`starting client ${config.version}${config.binary ? ` using ${config.binary}` : ''}...`)
+
+        if (gpus.length === 0) {
+            log.error(`no GPUs were selected for mining`)
+
+            return nextTick(() => this.emit('stop'))
+        }
+
+        log.info(`using ${gpus.length} GPUs:`)
+        for (const gpu of gpus) {
+            log.info(`  ${gpu.type} id ${gpu.id} boost ${gpu.boost} ${gpu.name}`)
+        }
+
+        if (!config.wallet) {
+            log.error(`no wallet configured`)
+
+            return nextTick(() => this.emit('stop'))
+        }
+
         log.info(`mining for wallet ${config.wallet}`)
 
         const onError = (error: Error) => {
@@ -68,26 +88,15 @@ class TonPoolClient extends EventEmitter {
             }
         }
 
-        const miners = config.gpus.map((id) => {
-            const gpuId = Number.parseInt(id, 10)
-            // if user passed -F 256 set all GPUs to 256
-            // if user passed -F 64,32 but has three GPUs, third GPU will use boost factor of 512 for NVIDIA or 64 for AMD
-            const defaultBoost = config.boost.length === 1 ? config.boost[0]! : /cuda/.test(config.binary) ? 512 : 64
-            const boost = config.boost[gpuId] !== undefined ? config.boost[gpuId]! : defaultBoost
-            const miner = new Miner(gpuId, config.wallet, config.minerPath, config.dataDir, boost)
+        const miners = gpus.map((gpu) => {
+            const miner = new Miner(gpu, config.wallet, config.dataDir)
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
-            miner.on('hashrate', (hashrate) => this.emit('hashrate', id, hashrate))
+            miner.on('hashrate', (hashrate) => this.emit('hashrate', miner.id, hashrate))
 
             return miner
         })
 
-        log.info(`mining using ${miners.length} gpus`)
-
-        if (config.boost.length > 1 || config.boost[0] !== (/cuda/.test(config.binary) ? 512 : 64)) {
-            log.info(`using custom boost factors: ${JSON.stringify(miners.map((miner) => miner.boost))}`)
-        }
-
-        log.info(`choosen pool is "${config.pool.replace('wss://', '')}"`)
+        log.info(`chosen pool is "${config.pool.replace('wss://', '')}"`)
 
         let reconnecting = false
         this.client = new Client(config.pool, config.wallet, config.rig, config.version)
@@ -146,15 +155,15 @@ class TonPoolClient extends EventEmitter {
                 this.client!.submit(solution).then(
                     () => {
                         log.info('share submitted')
-                        this.emit('submit')
+                        this.emit('submit', miner.id)
                     },
                     (error: Error) => {
                         onError(new Error(`miner error: failed to submit share: ${error.message}`))
 
                         if (error instanceof StratumError) {
-                            if (error.code === 21) return this.emit('submitStale')
-                            if (error.code === 22) return this.emit('submitDuplicate')
-                            if (error.code === 23) return this.emit('submitInvalid')
+                            if (error.code === 21) return this.emit('submitStale', miner.id)
+                            if (error.code === 22) return this.emit('submitDuplicate', miner.id)
+                            if (error.code === 23) return this.emit('submitInvalid', miner.id)
                         }
 
                         return undefined

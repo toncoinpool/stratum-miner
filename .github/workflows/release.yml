@@ -80,8 +80,6 @@ jobs:
                 include:
                     - os: windows-latest
                       platform: windows
-                    - os: macos-latest
-                      platform: mac
                     - os: ubuntu-latest
                       platform: linux
 

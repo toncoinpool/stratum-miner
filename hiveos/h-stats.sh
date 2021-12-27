@@ -21,22 +21,17 @@ busids=(`echo "$GPU_STATS_JSON" | jq -r ".busids[]"`)
 brands=(`echo "$GPU_STATS_JSON" | jq -r ".brand[]"`)
 indexes=()
 
-# filter arrays by $TONPOOL_BIN
+# in TONPOOL_STATS_JSON gpus are sorted by CUDA first, then OpenCL
 cnt=${#busids[@]}
 for (( i=0; i < $cnt; i++)); do
-	if [[ "${brands[$i]}" == "nvidia" && "$TONPOOL_BIN" == "cuda-18" ]]; then
-	  indexes+=($i)
-	  continue
-	elif [[ "${brands[$i]}" == "amd" && "$TONPOOL_BIN" == "opencl-18" ]]; then
-	  indexes+=($i)
-	  continue
-	else # remove arrays data
-		unset temps[$i]
-		unset fans[$i]
-		unset powers[$i]
-		unset busids[$i]
-		unset brands[$i]
-	fi
+    if [[ "${brands[$i]}" == "nvidia" && ( "$TONPOOL_BIN" == "cuda-18" || -z "$TONPOOL_BIN" ) ]]; then
+        indexes+=($i)
+    fi
+done
+for (( i=0; i < $cnt; i++)); do
+    if [[ "${brands[$i]}" == "amd" && ( "$TONPOOL_BIN" == "opencl-18" || -z "$TONPOOL_BIN" ) ]]; then
+        indexes+=($i)
+    fi
 done
 
 STATUS_TEMP=()
