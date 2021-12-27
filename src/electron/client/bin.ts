@@ -5,10 +5,25 @@ import log from './logger'
 import readGPUs from './read-gpus'
 import TonPoolClient from '.'
 
+let isShuttingDown = false
+const onShutdown: NodeJS.SignalsListener = (signal) => {
+    if (isShuttingDown) {
+        return undefined
+    }
+
+    isShuttingDown = true
+    log.info(`${signal} received, shutting down...`)
+
+    return void TonPoolClient.stop().finally(() => process.exit())
+}
+
+process.once('SIGHUP', onShutdown)
+process.once('SIGINT', onShutdown)
+process.once('SIGTERM', onShutdown)
+
 void (async function main() {
     const config = readConfig()
     const gpus = await readGPUs(config.baseBinaryPath, config.boost, config.excludeGPUs, config.binary)
-    TonPoolClient.on('stop', () => process.exit())
     TonPoolClient.start(config, gpus)
 
     if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {

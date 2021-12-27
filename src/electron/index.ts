@@ -48,7 +48,7 @@ app.on('ready', () => {
     if (config.headless) {
         readGPUs(config.baseBinaryPath, config.boost, config.excludeGPUs, config.binary).then(
             (gpus) => {
-                TonPoolClient.on('stop', () => app.exit())
+                TonPoolClient.on('stop', () => app.quit())
                 TonPoolClient.start(config, gpus)
             },
             () => {} // eslint-disable-line @typescript-eslint/no-empty-function
@@ -69,7 +69,7 @@ app.on('ready', () => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit()
+        TonPoolClient.stop().finally(() => app.quit())
     }
 })
 
@@ -107,9 +107,7 @@ ipcMain.on('miningStart', async (event: IpcMainEvent, guiConfig: GUIConfig) => {
 })
 
 ipcMain.on('miningStop', (event: IpcMainEvent) => {
-    void TonPoolClient.stop()
-
-    event.reply('miningStop', true)
+    TonPoolClient.stop().finally(() => void event.reply('miningStop', true))
 })
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises

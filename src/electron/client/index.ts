@@ -102,11 +102,10 @@ class TonPoolClient extends EventEmitter {
         this.client = new Client(config.pool, config.wallet, config.rig, config.version)
             .on('close', (code, reason) => {
                 log.info(`connection closed with ${code} ${reason}`)
+                miners.forEach((miner) => miner.stop())
 
                 this.state = this.DISCONNECTED
                 this.emit('stop')
-
-                miners.forEach((miner) => miner.stop())
             })
             .on('complexity', (complexity) => {
                 miners.forEach((miner) => miner.setComplexity(complexity))
@@ -182,7 +181,7 @@ class TonPoolClient extends EventEmitter {
             return Promise.resolve()
         }
 
-        return Promise.all([new Promise((resolve) => this.client!.once('close', resolve)), this.client.destroy()]).then(
+        return Promise.all([new Promise<void>((resolve) => this.once('stop', resolve)), this.client.destroy()]).then(
             () => undefined
         )
     }
