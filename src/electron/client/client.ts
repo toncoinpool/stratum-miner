@@ -165,15 +165,17 @@ class Client extends EventEmitter {
 
         return new Promise((resolve, reject) => {
             const onTimeout = () => {
+                this.ws.removeListener('close', onClose)
                 this.removeListener('message', onResponse)
                 this.ws.terminate()
 
-                return reject(new Error(`"${method}" error: server did not respond for 5 seconds`))
+                return reject(new Error(`"${method}" error: server did not respond for 10 seconds`))
             }
             const onResponse = (message: Message) => {
                 // Skip other messages with different ids
                 if (message.id !== id) return undefined
 
+                this.ws.removeListener('close', onClose)
                 this.removeListener('message', onResponse)
                 clearTimeout(timeout)
 
@@ -181,7 +183,14 @@ class Client extends EventEmitter {
                     ? resolve(message.result)
                     : reject(new StratumError(method, id, message.error[0], message.error[1], message.error[2]))
             }
+            const onClose = () => {
+                this.removeListener('message', onResponse)
+                clearTimeout(timeout)
 
+                return reject(new Error(`"${method}" error: connection closed`))
+            }
+
+            this.ws.once('close', onClose)
             this.on('message', onResponse)
             const timeout = setTimeout(onTimeout, 10000)
         })
