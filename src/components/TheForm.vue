@@ -224,6 +224,8 @@
                 localStorage.setItem("gpus", JSON.stringify(config.gpus))
                 localStorage.setItem("wallet", config.wallet)
                 localStorage.setItem("rig", config.rig)
+
+                getBalance();
             }
 
             const miningStop = () => {
