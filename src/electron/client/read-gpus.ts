@@ -58,7 +58,7 @@ export default async function readGPUs(
 
     if (bin === '' || /cuda/.test(bin)) {
         try {
-            const defaultBoost = /^\d+$/.test(boosts) ? Number.parseInt(boosts, 10) : 512
+            const defaultBoost = /^\d+$/.test(boosts) ? Number.parseInt(boosts, 10) : 2048
             const cudaGPUs = await parseCudaGPUs(baseBinaryPath, bin, boostFactors, gpuFilters, defaultBoost)
 
             for (const cudaGPU of cudaGPUs) {

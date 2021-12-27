@@ -52,8 +52,8 @@ Setting up custom miner:
     -   `TONPOOL_BOOST` - configure boost factors
         ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
         Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs.
-        The only way to find device ids is to run the miner first and check miner logs. Default boost factor is `512`
-        for Nvidia or `64` for AMD
+        The only way to find device ids is to run the miner first and check miner logs. Default boost factor is `2048`
+        for Nvidia(recommended for GTX 1080 and above) or `64` for AMD
 
         Given the following device list in miner logs:
 

@@ -81,7 +81,8 @@ TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <bo
 -   `-F --boost <boost-factors>`: configure boost factors
     ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
     Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs. To
-    list device ids run the client without `--wallet` argument. Defaults to `512` for Nvidia or `64` for AMD.
+    list device ids run the client without `--wallet` argument. Defaults to `2048` for Nvidia(recommended for GTX 1080
+    and above) or `64` for AMD.
 
     Given the following device list in miner logs:
 
