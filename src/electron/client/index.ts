@@ -155,7 +155,6 @@ class TonPoolClient extends EventEmitter {
             miner.on('success', (solution) => {
                 this.client!.submit(solution).then(
                     () => {
-                        log.info('share submitted')
                         this.emit('submit', miner.id)
                     },
                     (error: Error) => {
