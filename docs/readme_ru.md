@@ -76,7 +76,7 @@ TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <bo
 
     По умолчанию использует Nvidia и AMD вместе
 
--   `-F --boost <boost-factors>`: указание бустфактора
+-   `-F, --boost <boost-factors>`: указание бустфактора
     ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
     Может быть одним числом, чтобы применить его ко всем видеокартам, или списком чисел, через запятую вида
     `<id>:<boost>,<id>:<boost>,...`. Для получения списка айди девайсов запустите клиент без `--wallet` аргумента. По
