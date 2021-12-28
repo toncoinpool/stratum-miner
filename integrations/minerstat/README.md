@@ -41,7 +41,7 @@ fill in the fields:
         ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
         Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs.
         The only way to find device ids is to run the miner first and check it's logs. Defaults to `2048` for
-        Nvidia(recommended for GTX 1080 and above) or `64` for AMD.
+        Nvidia(recommended for RTX 2080Ti and above) or `64` for AMD.
 
         Given the following device list in miner logs:
 
