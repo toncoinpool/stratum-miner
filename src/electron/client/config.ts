@@ -49,7 +49,7 @@ export default function readConfig(): Config {
         integration: '',
         pool: 'wss://pplns.toncoinpool.io/stratum',
         rig: 'default',
-        version: '1.0.13',
+        version: '2.0.0',
         wallet: '',
         ...jsonConfig,
         ...cliConfig
