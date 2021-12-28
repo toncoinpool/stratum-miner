@@ -78,7 +78,14 @@ void (async function main() {
         const accepted = values.reduce((acc, { accepted }) => acc + accepted, 0)
         const rejected = values.reduce((acc, { duplicate, invalid, stale }) => acc + duplicate + invalid + stale, 0)
 
-        log.info(`hs: ${hs} | shares: ${accepted}|${rejected}`)
+        fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
+            .then((res) => res.json())
+            .then((data) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const balance = (data.balance / 10 ** 9).toFixed(4)
+                log.info(`hs: ${hs} | shares: ${accepted}|${rejected} | balance: ${balance}`)
+            })
+            .catch((err) => log.error(`failed to get balance: ${err}`))
     }, 1000 * 60).unref()
 
     if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
