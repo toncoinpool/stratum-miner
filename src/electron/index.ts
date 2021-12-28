@@ -17,6 +17,7 @@ const createWindow = () => {
             preload: resolve(__dirname, 'preload.js')
         }
     })
+    mainWindow.setMenuBarVisibility(false)
 
     void mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
 

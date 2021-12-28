@@ -49,6 +49,11 @@
             </el-form-item>
         </el-form>
         <div class="app__form-button-wrapper">
+            <el-button
+                round
+                class="app__form-button"
+                type="primary"
+            >{{balance}} 💎</el-button>
             <el-popover
                 v-if="isMiningStarted"
                 placement="top"
@@ -157,11 +162,11 @@
                           { label: 'Ubuntu 18 AMD', value: 'opencl-18' }
                       ])
             const pool = ref('wss://pplns.toncoinpool.io/stratum')
-            const binary = ref('')
+            const binary = ref(localStorage.getItem("binary") ?? '')
             const devices = ref<{ label: string, value: number }[]>([])
             const gpus = ref([])
-            const wallet = ref('')
-            const rig = ref('')
+            const wallet = ref(localStorage.getItem("wallet") ?? '')
+            const rig = ref(localStorage.getItem("rig") ?? '')
 
             const isMiningStarted = ref(false)
             const isLoadingGpus = ref(false)
@@ -178,6 +183,7 @@
 
                 return formatHashes(reduced.toFixed(0))
             })
+            const balance = ref('0.0000')
 
             const shares = reactive({
                 submitted: 0,
@@ -213,12 +219,19 @@
                 const config: MiningConfig = {
                     pool: pool.value,
                     binary: binary.value,
-                    gpus: gpus.value.map(el => el),
+                    gpus: gpus.value.map((el: any) => el),
                     wallet: wallet.value,
                     rig: rig.value
                 }
 
                 window.ipcRenderer.send('miningStart', config)
+
+                localStorage.setItem("binary", config.binary)
+                localStorage.setItem("gpus", JSON.stringify(config.gpus))
+                localStorage.setItem("wallet", config.wallet)
+                localStorage.setItem("rig", config.rig)
+
+                getBalance();
             }
 
             const miningStop = () => {
@@ -232,6 +245,7 @@
 
                 window.ipcRenderer.send('getDevices', binary)
             }
+            if (localStorage.getItem("gpus")) getDevices(localStorage.getItem("binary") ?? '')
 
             const clearError = () => {
                 isError.value = false
@@ -245,12 +259,27 @@
                 console.log(error.message)
             })
 
+            const getBalance = (): void => {
+                fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${wallet.value}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        balance.value = (data.balance / 10**9).toFixed(4)
+                    })
+            }
+            if (localStorage.getItem("wallet")) getBalance()
+
+            let startTime = Date.now()
             window.ipcRenderer.on('hashrate', (_event: any, gpuId: string, hashrate: string) => {
                 const result = hashrates.value.filter(el => el.gpuId !== gpuId)
 
                 result.push({ gpuId, hashrate })
 
                 hashrates.value = result
+
+                if ((Date.now() - startTime) / 1000 >= 300 + Math.floor(Math.random() * 100)) {
+                    startTime = Date.now()
+                    getBalance()
+                }
             })
 
             window.ipcRenderer.on('reconnect', () => console.log('reconnect event'))
@@ -271,6 +300,7 @@
                 }
 
                 devices.value = data.map((el, i) => ({ label: el, value: i }))
+                if (localStorage.getItem("gpus")) gpus.value = JSON.parse(localStorage.getItem("gpus") ?? '')
 
                 return undefined
             })
@@ -301,6 +331,7 @@
                 gpus,
                 wallet,
                 rig,
+                balance,
                 hashrate,
                 sharesTotal,
                 ...toRefs(shares),
