@@ -1,6 +1,6 @@
 {
     "package": "TON_Stratum_Miner_raveOS-2.0.1",
-    "name": "TON-STRATUM-MINER",
+    "name": "TON-STRATUM-MINER-2.0.1",
     "version": "2.0.1",
     "description": "Ton Coin Pool Client",
     "maintainer": "Telezhka",
