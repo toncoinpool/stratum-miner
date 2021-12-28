@@ -17,7 +17,7 @@
     -   `Choose coin` - `Toncoin`
     -   `Pool mode` - `default`
     -   `Connection type` - `default`
-    -   `Add URLs` - `wss://pplns.toncoinpool.io/stratum`
+    -   `Add URLs` - `main` | `wss://pplns.toncoinpool.io/stratum`
 
 7.  go to `WALLETS` tab
 8.  press `+ Add` and fill in the form:
@@ -42,7 +42,7 @@
 
             Defaults to using both Nvidia and AMD
 
-        -   `-F --boost <boost-factors>`: configure boost factors
+        -   `-F, --boost <boost-factors>`: configure boost factors
             ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
             Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...`
             pairs. The only way to find device ids is to run the miner first and check it's logs. Defaults to `2048` for
@@ -63,3 +63,9 @@
 
         -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io).
             Defaults to `default`
+
+        Example:
+
+        ```
+        -b cuda-18 -F 1024 -r myRaveRig
+        ```
