@@ -20,7 +20,7 @@ if test -f $TONPOOL_STATS_JSON; then
         ((i=$i+1))
     done
 
-    hashrate_gpu=",gpu0:${gpus["gpu0"]},gpu1:${gpus["gpu1"]},gpu2:${gpus["gpu2"]},gpu3:${gpus["gpu3"]},gpu4:${gpus["gpu4"]},gpu5:${gpus["gpu5"]},gpu6:${gpus["gpu6"]},gpu7:${gpus["gpu7"]},gpu8:${gpus["gpu8"]},gpu9:${gpus["gpu9"]},gpu10:${gpus["gpu10"]},gpu11:${gpus["gpu11"]},gpu12:${gpus["gpu12"]},gpu13:${gpus["gpu13"]},gpu14:${gpus["gpu14"]},gpu15:${gpus["gpu15"]}"
+    hashrate_gpu=",gpu0:\"${gpus["gpu0"]}\",gpu1:\"${gpus["gpu1"]}\",gpu2:\"${gpus["gpu2"]}\",gpu3:\"${gpus["gpu3"]}\",gpu4:\"${gpus["gpu4"]}\",gpu5:\"${gpus["gpu5"]}\",gpu6:\"${gpus["gpu6"]}\",gpu7:\"${gpus["gpu7"]}\",gpu8:\"${gpus["gpu8"]}\",gpu9:\"${gpus["gpu9"]}\",gpu10:\"${gpus["gpu10"]}\",gpu11:\"${gpus["gpu11"]}\",gpu12:\"${gpus["gpu12"]}\",gpu13:\"${gpus["gpu13"]}\",gpu14:\"${gpus["gpu14"]}\",gpu15:\"${gpus["gpu15"]}\""
 else
     shares_accepted="0"
     shares_rejected="0"

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
-TONPOOL_EXECUTABLE="$SCRIPT_DIR/TON-Stratum-Miner"
+TONPOOL_HIVE_CONF="/hive/miners/custom/TON_Stratum_Miner_HiveOS/config/hive-config.json"
+TONPOOL_EXECUTABLE="/hive/miners/custom/TON_Stratum_Miner_HiveOS/TON-Stratum-Miner"
 
 if [[ ! -f "$TONPOOL_HIVE_CONF" || ! -s "$TONPOOL_HIVE_CONF" ]]; then
     echo "$TONPOOL_HIVE_CONF does not exist or empty. Please reinstall miner."
@@ -15,16 +14,16 @@ TONPOOL_EXCLUDE_GPUS=$(jq -r ".excludeGPUs" $TONPOOL_HIVE_CONF)
 TONPOOL_RIGNAME=$(jq -r ".rig" $TONPOOL_HIVE_CONF)
 WALLET_ADR=$(jq -r ".wallet" $TONPOOL_HIVE_CONF)
 
-source h-manifest.conf
+source "/hive/miners/custom/TON_Stratum_Miner_HiveOS/h-manifest.conf"
 
 CUSTOM_LOG_BASEDIR=`dirname "$CUSTOM_LOG_BASENAME"`
 [[ ! -d $CUSTOM_LOG_BASEDIR ]] && mkdir -p $CUSTOM_LOG_BASEDIR
 
 $TONPOOL_EXECUTABLE \
-    "--integration hiveos" \
-    ${WALLET_ADR:+"-w $WALLET_ADR"} \
-    ${TONPOOL_BIN:+"-b $TONPOOL_BIN"} \
-    ${TONPOOL_BOOST:+"-F $TONPOOL_BOOST"} \
-    ${TONPOOL_EXCLUDE_GPUS:+"--exclude-gpus $TONPOOL_EXCLUDE_GPUS"} \
-    ${TONPOOL_RIGNAME:+"-r $TONPOOL_RIGNAME"} \
+    --integration hiveos \
+    -w ${WALLET_ADR:-""} \
+    -b ${TONPOOL_BIN:-""} \
+    -F ${TONPOOL_BOOST:-""} \
+    --exclude-gpus ${TONPOOL_EXCLUDE_GPUS:-""} \
+    -r ${TONPOOL_RIGNAME:-""} \
     2>&1 | tee --append $CUSTOM_LOG_BASENAME.log

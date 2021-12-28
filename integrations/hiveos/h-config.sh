@@ -1,7 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
+TONPOOL_HIVE_CONF="/hive/miners/custom/TON_Stratum_Miner_HiveOS/config/hive-config.json"
 
 source $RIG_CONF
 source $WALLET_CONF

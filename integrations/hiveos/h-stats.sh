@@ -2,9 +2,8 @@
 
 # originally copied from https://github.com/tontechio/pow-miner-gpu-hiveos
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
-TONPOOL_STATS_JSON="$SCRIPT_DIR/data/stats.json"
+TONPOOL_HIVE_CONF="/hive/miners/custom/TON_Stratum_Miner_HiveOS/config/hive-config.json"
+TONPOOL_STATS_JSON="/hive/miners/custom/TON_Stratum_Miner_HiveOS/data/stats.json"
 TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
 
 #-------------------------------------------------------------------------
@@ -72,7 +71,7 @@ temp=$(echo "${STATUS_TEMP[@]}" | jq -s '.')
 fan=$(echo "${STATUS_FAN[@]}" | jq -s '.')
 bus_numbers=$(echo "${STATUS_BUS_NUMBERS[@]}" | jq -s '.')
 
-source "$SCRIPT_DIR/h-manifest.conf"
+source "/hive/miners/custom/TON_Stratum_Miner_HiveOS/h-manifest.conf"
 
 stats=$(
     jq -n \

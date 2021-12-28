@@ -17,7 +17,7 @@ else:
     with open(stats_json_path) as f:
         stats_json = json.loads(f.read())
 
-    args = cfg['args'] if 'args' in cfg and cfg['args'] is not None else ''
+    args = ' '.join(cfg['args'] or [])
     if '-b ' in args or '--bin ' in args:
         if '-b cuda-18' in args or '--bin cuda-18' in args:
             kind = 'NVIDIA'
