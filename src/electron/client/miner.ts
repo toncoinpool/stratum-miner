@@ -2,6 +2,7 @@ import { ChildProcess, execFile } from 'child_process'
 import EventEmitter from 'events'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
+import { GPU } from './read-gpus'
 
 interface MinedBody {
     op?: bigint
@@ -58,25 +59,23 @@ interface Miner {
 }
 
 class Miner extends EventEmitter {
-    public boost: number
-    public id: number
+    public id: string
 
     protected expired = ''
     protected complexity = ''
     protected giver = ''
+    protected gpu: GPU
     protected iterations = '9223372036854775807'
-    protected minerPath: string
     protected ref?: ChildProcess = undefined
     protected seed = ''
     protected solutionPath: string
     protected stopped = false
     protected wallet: string
 
-    constructor(id: number, wallet: string, minerPath: string, dataDir: string, boost: number) {
+    constructor(gpu: GPU, wallet: string, dataDir: string) {
         super()
-        this.boost = boost
-        this.id = id
-        this.minerPath = minerPath
+        this.gpu = gpu
+        this.id = gpu.id
         this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
         this.wallet = wallet
     }
@@ -150,32 +149,6 @@ class Miner extends EventEmitter {
         this.ref ? this.ref.kill() : this.run()
     }
 
-    static getDevices(binary: string): Promise<string[]> {
-        const minerPath = resolve(__dirname, '../..', 'bin', binary)
-
-        return new Promise((resolve, reject) => {
-            execFile(minerPath, (error, stdout, stderr) => {
-                const re = /^(\[ [^\]]+ \])/gim
-                const matches = [...stderr.matchAll(re)]
-                const devices = matches
-                    .map((el) => {
-                        const reStart = /^\[ (OpenCL: platform #[0-9]+ device #[0-9]+|GPU #[0-9]+:) /gim
-                        const reEnd = / \](.*)/gim
-                        const device = el?.[0]?.replace(reStart, '').replace(reEnd, '')
-
-                        return device
-                    })
-                    .filter((el): el is string => el !== undefined)
-
-                if (!devices.length) {
-                    return reject(stderr || error)
-                }
-
-                resolve(devices)
-            })
-        })
-    }
-
     protected run(): void {
         // once stopped, calling start() followed by setTarget() will start the mining loop again
         if (this.stopped) {
@@ -185,11 +158,12 @@ class Miner extends EventEmitter {
         const currentExpire = this.expired
 
         this.ref = execFile(
-            this.minerPath,
+            this.gpu.minerPath,
             [
                 '-vv',
-                ...['-g', this.id.toString()],
-                ...['-F', this.boost.toString()],
+                ...['-g', this.gpu.deviceId.toString()],
+                ...(this.gpu.type === 'OpenCL' ? ['-p', this.gpu.platformId.toString()] : []),
+                ...['-F', this.gpu.boost.toString()],
                 ...['-e', currentExpire],
                 this.wallet,
                 ...[this.seed, this.complexity, this.iterations, this.giver],

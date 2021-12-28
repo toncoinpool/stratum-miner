@@ -26,16 +26,16 @@ jobs:
             - run: sudo apt-get install -y zip
             - name: install dependencies
               run: npm install
-            - name: build-pkg ${{ matrix.platform }}
-              run: npm run pkg:build
-            - name: pack-pkg ${{ matrix.platform }}
-              run: tar -zcf TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON-Stratum-Miner
+            - run: npm run pkg:win:build
+            - run: zip -r TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-win-headless.zip TON-Stratum-Miner
+            - run: npm run pkg:linux:build
+            - run: tar -zcf TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON-Stratum-Miner
             - run: mkdir TON_Stratum_Miner_HiveOS
             - run: mkdir TON_Stratum_Miner_HiveOS/bin
             - run: cp ./bin/opencl-18 ./bin/cuda-18 ./TON_Stratum_Miner_HiveOS/bin
             - run: cp -r ./config/ ./TON_Stratum_Miner_HiveOS
             - run: cp -r ./data/ ./TON_Stratum_Miner_HiveOS
-            - run: cp ./hiveos/* ./TON_Stratum_Miner_HiveOS
+            - run: cp ./integrations/hiveos/* ./TON_Stratum_Miner_HiveOS
             - run: cp ./TON-Stratum-Miner/TON-Stratum-Miner ./TON_Stratum_Miner_HiveOS
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-config.sh
             - run: chmod 777 ./TON_Stratum_Miner_HiveOS/h-run.sh
@@ -68,6 +68,7 @@ jobs:
                   gzip: false
                   files: >
                       TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz
+                      TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-win-headless.zip
                       TON_Stratum_Miner_HiveOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
                       TON_Stratum_Miner_msOS-${{ steps.get_version.outputs.version-without-v }}.tar.gz
                       TON_Stratum_Miner_raveOS-${{ steps.get_version.outputs.version-without-v }}.zip
@@ -80,8 +81,6 @@ jobs:
                 include:
                     - os: windows-latest
                       platform: windows
-                    - os: macos-latest
-                      platform: mac
                     - os: ubuntu-latest
                       platform: linux
 

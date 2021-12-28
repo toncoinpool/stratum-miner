@@ -146,15 +146,21 @@
             const pools = ref([
                 { label: 'TON Coin Pool - PPLNS', value: 'wss://pplns.toncoinpool.io/stratum' }
             ])
-            const binaries = ref([
-                { label: 'Windows CUDA', value: 'cuda.exe' },
-                { label: 'Windows OpenCL', value: 'opencl.exe' },
-                { label: 'Ubuntu 20.04 CUDA', value: 'cuda-20' },
-                { label: 'Ubuntu 18.04 CUDA', value: 'cuda-18' },
-                { label: 'Ubuntu 20.04 OpenCL', value: 'opencl-20' },
-                { label: 'Ubuntu 18.04 OpenCL', value: 'opencl-18' },
-                { label: 'Mac OpenCL', value: 'opencl-mac' }
-            ])
+            const binaries =
+                window.navigator.platform.substring(0, 3).toLowerCase() === 'win'
+                    ? ref([
+                          { label: 'Windows Nvidia/AMD', value: 'cuda.exe,opencl.exe' },
+                          { label: 'Windows Nvidia', value: 'cuda.exe' },
+                          { label: 'Windows AMD', value: 'opencl.exe' }
+                      ])
+                    : ref([
+                          { label: 'Ubuntu 20 Nvidia/AMD', value: 'cuda-20,opencl-20' },
+                          { label: 'Ubuntu 20 Nvidia', value: 'cuda-20' },
+                          { label: 'Ubuntu 20 AMD', value: 'opencl-20' },
+                          { label: 'Ubuntu 18 Nvidia/AMD', value: 'cuda-18,opencl-18' },
+                          { label: 'Ubuntu 18 Nvidia', value: 'cuda-18' },
+                          { label: 'Ubuntu 18 AMD', value: 'opencl-18' }
+                      ])
             const pool = ref('wss://pplns.toncoinpool.io/stratum')
             const binary = ref(localStorage.getItem("binary") ?? '')
             const devices = ref<{ label: string, value: number }[]>([])

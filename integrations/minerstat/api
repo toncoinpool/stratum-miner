@@ -9,13 +9,18 @@ if test -f $TONPOOL_STATS_JSON; then
     hashrate_total=$(jq ".khs | . * 1000 | tostring" $TONPOOL_STATS_JSON)
     uptime_in_sec=$(jq ".uptime | tostring" $TONPOOL_STATS_JSON)
 
-    hs_pairs="$(jq -r '.hs | to_entries | .[] | "gpu" + (.key | tostring) + "=" + (.value * 1000 * 1000 | tostring)' $TONPOOL_STATS_JSON)"
-
-    for key in ${hs_pairs}; do
-        eval ${key}
+    declare -A gpus
+    i=0
+    for gpu in $(jq -rc ".gpus[]" $TONPOOL_STATS_JSON); do
+        name="gpu$i"
+        hs=$(echo "$gpu" | jq ".hashrate | . * 1000 | . * 1000")
+        accepted=$(echo "$gpu" | jq ".accepted")
+        rejected=$(echo "$gpu" | jq ".duplicate + .invalid + .stale")
+        gpus[$name]="$hs/$accepted/$rejected"
+        ((i=$i+1))
     done
 
-    hashrate_gpu=",gpu0:$gpu0,gpu1:$gpu1,gpu2:$gpu2,gpu3:$gpu3,gpu4:$gpu4,gpu5:$gpu5,gpu6:$gpu6,gpu7:$gpu7,gpu8:$gpu8,gpu9:$gpu9,gpu10:$gpu10,gpu11:$gpu11,gpu12:$gpu12,gpu13:$gpu13,gpu14:$gpu14,gpu15:$gpu15"
+    hashrate_gpu=",gpu0:\"${gpus["gpu0"]}\",gpu1:\"${gpus["gpu1"]}\",gpu2:\"${gpus["gpu2"]}\",gpu3:\"${gpus["gpu3"]}\",gpu4:\"${gpus["gpu4"]}\",gpu5:\"${gpus["gpu5"]}\",gpu6:\"${gpus["gpu6"]}\",gpu7:\"${gpus["gpu7"]}\",gpu8:\"${gpus["gpu8"]}\",gpu9:\"${gpus["gpu9"]}\",gpu10:\"${gpus["gpu10"]}\",gpu11:\"${gpus["gpu11"]}\",gpu12:\"${gpus["gpu12"]}\",gpu13:\"${gpus["gpu13"]}\",gpu14:\"${gpus["gpu14"]}\",gpu15:\"${gpus["gpu15"]}\""
 else
     shares_accepted="0"
     shares_rejected="0"

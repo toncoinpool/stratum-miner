@@ -1,8 +1,4 @@
 {
-    "boost": [512],
-    "gpus": ["0"],
     "pool": "wss://pplns.toncoinpool.io/stratum",
-    "wallet": "YOUR_TON_ADDRESS",
-    "rig": "default",
-    "binary": "cuda-20"
+    "rig": "default"
 }

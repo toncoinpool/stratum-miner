@@ -1,6 +1,6 @@
 {
     "name": "ton-pool-client",
-    "version": "1.0.13",
+    "version": "2.0.1",
     "author": "Telezhka",
     "license": "MIT",
     "description": "TON pool client",
@@ -22,7 +22,10 @@
         "format:fix": "prettier --write .",
         "lint": "eslint --ext .ts .",
         "lint:fix": "eslint --fix --ext .ts .",
-        "pkg:build": "npm run clean && tsc -p tsconfig.prod.json && copyfiles config/* bin/* data/* TON-Stratum-Miner/ && pkg -c package.json -o TON-Stratum-Miner/TON-Stratum-Miner dist/electron/client/bin.js",
+        "prepkg:linux:build": "npm run clean && rimraf TON-Stratum-Miner && tsc -p tsconfig.prod.json && copyfiles config/* bin/cuda-18 bin/cuda-20 bin/opencl-18 bin/opencl-20 data/* TON-Stratum-Miner/",
+        "pkg:linux:build": "pkg -c package.json -t node16-linux-x64 -o TON-Stratum-Miner/TON-Stratum-Miner --public --no-bytecode --public-packages \"*\" dist/electron/client/bin.js",
+        "prepkg:win:build": "npm run clean && rimraf TON-Stratum-Miner && tsc -p tsconfig.prod.json && copyfiles config/* bin/*.exe bin/*.dll data/* TON-Stratum-Miner/",
+        "pkg:win:build": "pkg -c package.json -t node16-win-x64 -o TON-Stratum-Miner/TON-Stratum-Miner --public --no-bytecode --public-packages \"*\" dist/electron/client/bin.js",
         "typecheck": "tsc -p tsconfig.prod.json --noEmit"
     },
     "dependencies": {
@@ -114,8 +117,6 @@
             "node_modules/fp-ts/**/*"
         ],
         "scripts": [],
-        "targets": [
-            "node16-linux-x64"
-        ]
+        "targets": []
     }
 }

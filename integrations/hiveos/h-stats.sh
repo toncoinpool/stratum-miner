@@ -2,9 +2,8 @@
 
 # originally copied from https://github.com/tontechio/pow-miner-gpu-hiveos
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-TONPOOL_HIVE_CONF="$SCRIPT_DIR/config/hive-config.json"
-TONPOOL_STATS_JSON="$SCRIPT_DIR/data/stats.json"
+TONPOOL_HIVE_CONF="/hive/miners/custom/TON_Stratum_Miner_HiveOS/config/hive-config.json"
+TONPOOL_STATS_JSON="/hive/miners/custom/TON_Stratum_Miner_HiveOS/data/stats.json"
 TONPOOL_BIN=$(jq -r ".bin" $TONPOOL_HIVE_CONF)
 
 #-------------------------------------------------------------------------
@@ -21,22 +20,17 @@ busids=(`echo "$GPU_STATS_JSON" | jq -r ".busids[]"`)
 brands=(`echo "$GPU_STATS_JSON" | jq -r ".brand[]"`)
 indexes=()
 
-# filter arrays by $TONPOOL_BIN
+# in TONPOOL_STATS_JSON gpus are sorted by CUDA first, then OpenCL
 cnt=${#busids[@]}
 for (( i=0; i < $cnt; i++)); do
-	if [[ "${brands[$i]}" == "nvidia" && "$TONPOOL_BIN" == "cuda-18" ]]; then
-	  indexes+=($i)
-	  continue
-	elif [[ "${brands[$i]}" == "amd" && "$TONPOOL_BIN" == "opencl-18" ]]; then
-	  indexes+=($i)
-	  continue
-	else # remove arrays data
-		unset temps[$i]
-		unset fans[$i]
-		unset powers[$i]
-		unset busids[$i]
-		unset brands[$i]
-	fi
+    if [[ "${brands[$i]}" == "nvidia" && ( "$TONPOOL_BIN" == "cuda-18" || -z "$TONPOOL_BIN" ) ]]; then
+        indexes+=($i)
+    fi
+done
+for (( i=0; i < $cnt; i++)); do
+    if [[ "${brands[$i]}" == "amd" && ( "$TONPOOL_BIN" == "opencl-18" || -z "$TONPOOL_BIN" ) ]]; then
+        indexes+=($i)
+    fi
 done
 
 STATUS_TEMP=()
@@ -77,7 +71,7 @@ temp=$(echo "${STATUS_TEMP[@]}" | jq -s '.')
 fan=$(echo "${STATUS_FAN[@]}" | jq -s '.')
 bus_numbers=$(echo "${STATUS_BUS_NUMBERS[@]}" | jq -s '.')
 
-source "$SCRIPT_DIR/h-manifest.conf"
+source "/hive/miners/custom/TON_Stratum_Miner_HiveOS/h-manifest.conf"
 
 stats=$(
     jq -n \

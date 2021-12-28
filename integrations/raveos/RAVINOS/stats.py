@@ -17,23 +17,37 @@ else:
     with open(stats_json_path) as f:
         stats_json = json.loads(f.read())
 
-    args = ' '.join(cfg['args'])
-    if '-b ' in args and '-b opencl-18' in args:
-        kind = 'AMD'
-    elif '--bin ' in args and '--bin opencl-18' in args:
-        kind = 'AMD'
+    args = ' '.join(cfg['args'] or [])
+    if '-b ' in args or '--bin ' in args:
+        if '-b cuda-18' in args or '--bin cuda-18' in args:
+            kind = 'NVIDIA'
+        elif '-b opencl-18' in args or '--bin opencl-18' in args:
+            kind = 'AMD'
+        else:
+            kind = 'both'
     else:
-        kind = 'NVIDIA'
+        kind = 'both'
 
-    for mpu in stats_ravin['mpu']:
-        if (len(stats_json['hs']) == 0):
-            break
+    indexes = []
+    for i in range(len(stats_ravin['mpu'])):
+        if (stats_ravin['mpu'][i]['type'] == 'NVIDIA'):
+            if(kind == 'NVIDIA' or kind == 'both'):
+                indexes.append(i)
+    for i in range(len(stats_ravin['mpu'])):
+        if (stats_ravin['mpu'][i]['type'] == 'AMD'):
+            if(kind == 'AMD' or kind == 'both'):
+                indexes.append(i)
 
-        if (mpu['type'] != kind):
-            continue
-
-        hs = stats_json['hs'].pop(0)
-        mpu['hash_rate1'] = hs * 1e6
+    for i in range(len(stats_json['gpus'])):
+        gpu = stats_json['gpus'][i]
+        mpuIdx = indexes[i]
+        mpu = stats_ravin['mpu'][mpuIdx]
+        mpu['hash_rate1'] = gpu['hashrate'] * 1e6
+        mpu['shares'] = {
+            'accepted': gpu['accepted'],
+            'invalid': gpu['invalid'],
+            'rejected': gpu['duplicate'] + gpu['stale']
+        }
 
     stats_ravin['shares'] = {
         'accepted': stats_json['ar'][0],

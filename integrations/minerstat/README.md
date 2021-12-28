@@ -12,40 +12,52 @@ fill in the fields:
     https://github.com/toncoinpool/stratum-miner/releases/download/v<version>/TON_Stratum_Miner_msOS-<version>.tar.gz
     ```
 
-    where `<version>` - is the client version(`1.0.5`, `1.1.0`, etc.) from [releases](https://github.com/toncoinpool/stratum-miner/releases)
+    where `<version>` - is the client version(`1.0.13`, `2.0.0`, etc.) from [releases](https://github.com/toncoinpool/stratum-miner/releases)
     page. Example:
 
     ```
-    https://github.com/toncoinpool/stratum-miner/releases/download/v1.0.10/TON_Stratum_Miner_msOS-1.0.10.tar.gz
+    https://github.com/toncoinpool/stratum-miner/releases/download/v2.0.0/TON_Stratum_Miner_msOS-2.0.0.tar.gz
     ```
 
 -   `Executable file name` - `TON-Stratum-Miner`
 -   `Client config type` - `Arguments`
 -   `Client args/config` - This is a string of client's command-line arguments in the following form:
 
-    `--integration msOS --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--gpus <ids>] [--rig <name>]`
+    `--integration msOS --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--rig <name>]`
 
     You should change it for each worker, if necessary. Available options are:
 
     -   `--integration msOS`: _Required_
     -   `-w, --wallet`: _Required_. Your TON wallet's address
-    -   `-b, --bin <name>`: Name of the miner binary. Can be one of:
+    -   `-b, --bin <name>`: Name of the miner binary. Can be specified to use only Nvidia or only AMD GPUs. Can be one
+        of:
 
-        -   `cuda-18` - CUDA miner
-        -   `opencl-18` - OpenCL miner
+        -   `cuda-18` - Nvidia
+        -   `opencl-18` - AMD
 
-        Defaults to `cuda-18`
+        Defaults to using both Nvidia and AMD
 
-    -   `-F --boost <boost-factors>`: Comma-separated list of boost factors as described in
-        [pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md). If a
-        single number is passed it will be applied to all GPUs, otherwise you must pass a boost factor for each device
-        listed in `--gpus`. Defaults to `512` for CUDA or `64` for OpenCL. Examples:
-        -   `-g 0,1,2 -F 64,32,512`
-        -   `-g 0,1,2 -F 512`
-    -   `-g, --gpus <ids>`: Comma-separated list of GPU device Ids that should be used by miner. Defaults to `0`.
-        Example: `--gpus 0,3,4`
-    -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io).
-        Defaults to `default`
+    -   `-F --boost <boost-factors>`: configure boost factors
+        ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
+        Can be a single number to apply to all GPUs or a comma-separated list of `<id>:<boost>,<id>:<boost>,...` pairs.
+        The only way to find device ids is to run the miner first and check it's logs. Defaults to `2048` for
+        Nvidia(recommended for GTX 1080 and above) or `64` for AMD.
+
+        Given the following device list in miner logs:
+
+        ```
+        CUDA: id 0 boost 512 NVIDIA GeForce RTX 3080
+        OpenCL: id 1:0 boost 64 AMD Radeon RX 6600
+        ```
+
+        We can configure boost factor in the following ways:
+
+        -   `--boost 2048` - will use `2048` for all GPUs
+        -   `--boost 1:0:256` - will use the default value of `512` for 3080 and `256` for 6600
+        -   `--boost 0:1024,1:0:128` - will use `1024` for 3080 and `128` for 6600
+
+    -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to
+        `default`
 
 -   `Extra args` - you can add `| tee log.txt` here to create a log file in `/home/minerstat/minerstat-os/clients/<miner-name>/`
     to help with troubleshooting in case of any errors.
