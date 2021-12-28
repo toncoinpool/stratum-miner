@@ -1,4 +1,5 @@
 {
+    "private": "true",
     "name": "ton-pool-client",
     "version": "2.0.1",
     "author": "Telezhka",
