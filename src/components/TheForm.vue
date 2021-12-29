@@ -265,6 +265,7 @@
                     .then((data) => {
                         balance.value = (data.balance / 10**9).toFixed(4)
                     })
+                    .catch((err) => console.log(`failed to get balance: ${err}`))
             }
             if (localStorage.getItem("wallet")) getBalance()
 
