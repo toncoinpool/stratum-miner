@@ -64,6 +64,24 @@ void (async function main() {
         if (stat) stat.stale++
     })
 
+    let startTime = Date.now()
+    let prevBalance = '0.0000'
+
+    const getBalance = () => {
+        fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
+            .then((res) => res.json())
+            .then((data) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const balance = (data.balance / 10 ** 9).toFixed(4)
+
+                if (balance !== prevBalance) {
+                    prevBalance = balance
+                    log.info(`balance: ${balance}`)
+                }
+            })
+            .catch((err) => log.error(`failed to get balance: ${err}`))
+    }
+
     setInterval((): void => {
         if ([TonPoolClient.CONNECTED, TonPoolClient.MINING].includes(TonPoolClient.state) === false) {
             return undefined
@@ -78,14 +96,12 @@ void (async function main() {
         const accepted = values.reduce((acc, { accepted }) => acc + accepted, 0)
         const rejected = values.reduce((acc, { duplicate, invalid, stale }) => acc + duplicate + invalid + stale, 0)
 
-        fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
-            .then((res) => res.json())
-            .then((data) => {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                const balance = (data.balance / 10 ** 9).toFixed(4)
-                log.info(`hs: ${hs} | shares: ${accepted}|${rejected} | balance: ${balance}`)
-            })
-            .catch((err) => log.error(`failed to get balance: ${err}`))
+        log.info(`hs: ${hs} | shares: ${accepted}|${rejected}`)
+
+        if ((Date.now() - startTime) / 1000 >= 300 + Math.floor(Math.random() * 100)) {
+            startTime = Date.now()
+            getBalance()
+        }
     }, 1000 * 60).unref()
 
     if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
