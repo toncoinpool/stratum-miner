@@ -27,6 +27,7 @@ jobs:
             - name: install dependencies
               run: npm install
             - run: npm run pkg:win:build
+            - run: echo -e "TON-Stratum-Miner.exe -w your_wallet\r\npause" > TON-Stratum-Miner/TON-Stratum-Miner.bat
             - run: zip -r TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-win-headless.zip TON-Stratum-Miner
             - run: npm run pkg:linux:build
             - run: tar -zcf TON-Stratum-Miner-${{ steps.get_version.outputs.version-without-v }}-linux-headless.tar.gz TON-Stratum-Miner

@@ -158,7 +158,12 @@ class TonPoolClient extends EventEmitter {
                         this.emit('submit', miner.id)
                     },
                     (error: Error) => {
-                        onError(new Error(`miner error: failed to submit share: ${error.message}`))
+                        const submitError = new Error(`failed to submit share: ${error.message}`)
+                        log.warn(submitError)
+
+                        if (this.listenerCount('error') > 0) {
+                            this.emit('error', submitError)
+                        }
 
                         if (error instanceof StratumError) {
                             if (error.code === 21) return this.emit('submitStale', miner.id)

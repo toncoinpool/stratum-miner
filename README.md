@@ -47,18 +47,22 @@ Instructions can be found [here](integrations/hiveos/README.md)
 
 ### Headless
 
-You can run the client from the command-line on both linux and windows. Minimum required windows version is 8.1
+In addition to GUI clients, there are also command-line clients, which can be helpful if you need to debug launch
+issues, view runtime errors in the output and set boost factors(`--boost` option)
 
-Linux:
+On linux you can download `...-linux-headless.tar.gz` release and run it from the terminal like this:
 
 ```shell
 $ ./TON-Stratum-Miner --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
 ```
 
-Windows:
+On windows you can download `...-win-headless.zip` release, extract it, edit the extracted `TON-Stratum-Miner.bat` file
+using any text editor and run it. Minimum required windows version is 8.1. You should edit the
+`TON-Stratum-Miner.bat` like this:
 
 ```shell
 TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
+pause
 ```
 
 -   `-w, --wallet`: _Required_. Your TON wallet's address
@@ -100,6 +104,13 @@ TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <bo
 -   `--exclude-gpus <ids>`: disable mining on specific GPUs. A comma-separated list of device ids. To find id of a
     specific device run the client without `--wallet` argument. Example: `--exclude-gpus 0,1,1:0,1:1`
 -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io). Defaults to `default`
+
+Windows `TON-Stratum-Miner.bat` example:
+
+```shell
+TON-Stratum-Miner.exe -w your_wallet -b cuda.exe -F 1024 --exclude-gpus 1 -r myWindowsRig
+pause
+```
 
 ## Ton Coin Pool endpoints
 

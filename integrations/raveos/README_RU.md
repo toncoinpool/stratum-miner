@@ -16,7 +16,7 @@
     -   `Choose coin` - `Toncoin`
     -   `Pool mode` - `default`
     -   `Connection type` - `default`
-    -   `Add URLs` - `wss://pplns.toncoinpool.io/stratum`
+    -   `Add URLs` - `main` | `wss://pplns.toncoinpool.io/stratum`
 
 7.  перейдите во вкладку `WALLETS`
 8.  нажмите на кнопку `+ Add` и заполните форму следующими значениями:
@@ -41,7 +41,7 @@
 
             По умолчанию использует Nvidia и AMD вместе
 
-        -   `-F --boost <boost-factors>`: указание бустфактора
+        -   `-F, --boost <boost-factors>`: указание бустфактора
             ([pow-miner-gpu docs](https://github.com/tontechio/pow-miner-gpu/blob/main/crypto/util/pow-miner-howto.md)).
             Может быть одним числом, чтобы применить его ко всем видеокартам, или списком чисел, через запятую вида
             `<id>:<boost>,<id>:<boost>,...`. Для получения списка айди девайсов необходимо запустить майнер и посмотреть
@@ -62,4 +62,10 @@
             -   `--boost 0:1024,1:0:128` - будет использовать `1024` для 3080 и `128` для 6600
 
         -   `-r, --rig`: Под каким именем будет видна статистика этого клиента на [toncoinpool.io](https://toncoinpool.io).
-            По умолчанию `default`
+            По умолчанию использует имя воркера в RaveOS
+
+        Пример:
+
+        ```
+        -b cuda-18 -F 1024 -r myRaveRig
+        ```

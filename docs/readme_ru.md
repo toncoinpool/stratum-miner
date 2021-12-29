@@ -45,18 +45,22 @@
 
 ### Headless
 
-Вы можете запустить клиент из командной строки на linux и windows. Минимальная поддерживаемая версия windows: 8.1
+В дополнение к графическим клиентам, также доступны клиенты, запускаемые из командной строки. Они могут быть полезны для
+диагностики проблем при запуске и работе клиента, а также для указания бустфактора(`--boost` опция)
 
-Linux:
+Для Linux скачайте релиз `...-linux-headless.tar.gz` и запустите из терминала:
 
 ```shell
 $ ./TON-Stratum-Miner --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
 ```
 
-Windows:
+Для Windows скачайте релиз `...-win-headless.zip`, распакуйте, отредактируйте распакованный файл
+`TON-Stratum-Miner.bat`, используя любой текстовый редактор, и запустите. Минимальная поддерживаемая версия
+windows: 8.1. Шаблон для содержимого `TON-Stratum-Miner.bat` файла:
 
 ```shell
 TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <boost-factors>] [--exclude-gpus <ids>] [--rig <name>]
+pause
 ```
 
 -   `-w, --wallet`: _Обязательно_. Адрес вашего TON кошелька
@@ -100,6 +104,13 @@ TON-Stratum-Miner.exe --wallet <your-wallet-address> [--bin <name>] [--boost <bo
     `--exclude-gpus 0,1,1:0,1:1`
 -   `-r, --rig`: Под каким именем будет видна статистика этого клиента на [toncoinpool.io](https://toncoinpool.io).
     По умолчанию `default`
+
+Пример `TON-Stratum-Miner.bat` файла на Windows:
+
+```shell
+TON-Stratum-Miner.exe -w your_wallet -b cuda.exe -F 1024 --exclude-gpus 1 -r myWindowsRig
+pause
+```
 
 ## Ton Coin Pool endpoints
 
