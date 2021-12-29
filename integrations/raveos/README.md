@@ -62,7 +62,7 @@
             -   `--boost 0:1024,1:0:128` - will use `1024` for 3080 and `128` for 6600
 
         -   `-r, --rig`: How this client's stats will be seen on [toncoinpool.io](https://toncoinpool.io).
-            Defaults to `default`
+            Defaults uses RaveOS worker's name
 
         Example:
 
