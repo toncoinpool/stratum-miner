@@ -2,6 +2,10 @@
 
 [Ton Coin Pool](https://toncoinpool.io) client setup on [MinerstatOS](https://minerstat.com/software/mining-os)
 
+Update: MinerstatOS developers released official instructions for setting up our client
+[here](https://minerstat.com/help/custom-miners-how-to-set-up-ton-coin-miner). Only if they fail proceed with the
+following custom miner setup
+
 Following the official instructions on [adding new custom mining client](https://minerstat.com/help/how-to-add-a-custom-mining-client#2-add-new-custom-mining-client)
 fill in the fields:
 
