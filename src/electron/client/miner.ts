@@ -1,5 +1,6 @@
 import { ChildProcess, execFile } from 'child_process'
 import EventEmitter from 'events'
+import { platform } from 'os'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
 import { GPU } from './read-gpus'
@@ -171,8 +172,13 @@ class Miner extends EventEmitter {
             ],
             { timeout: 0 },
             (error, stdout, stderr) => {
+                const killed = this.ref?.killed
                 this.ref = undefined
 
+                // do not emit error when ref.kill is called on windows
+                if (killed && platform() === 'win32') {
+                    return this.run()
+                }
                 if (error && /expire_base [<>]=/.test(error.message)) {
                     // expire changed while were starting the miner
                     if (currentExpire !== this.expired) {
