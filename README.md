@@ -21,7 +21,8 @@ Currently only Nvidia and AMD GPUs are supported
 Download the appropriate executable for your platform from
 [Releases](https://github.com/toncoinpool/stratum-miner/releases) page:
 
--   Windows: file with `.exe` extension or `win-headless.zip`(recommended) archive containing CLI-only binary
+-   Windows: file with `.exe` extension or `win-headless.zip`(recommended) archive containing CLI-only binary.
+    **Windows 7 is not supported**
 -   macOS: `.zip` archive containing `.app` file. Last version with macOS support was `1.0.13`
 -   Linux: `.AppImage` file with GUI or `linux-headless.tar.gz`(recommended) archive containing CLI-only binary
 

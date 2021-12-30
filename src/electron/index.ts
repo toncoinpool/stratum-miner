@@ -21,15 +21,51 @@ const createWindow = () => {
 
     void mainWindow.loadURL(isDev ? 'http://127.0.0.1:5000' : `file://${resolve(__dirname, '..', 'index.html')}`)
 
-    TonPoolClient.on('connect', () => mainWindow.webContents.send('connect'))
-    TonPoolClient.on('error', (error) => mainWindow.webContents.send('error', error))
-    TonPoolClient.on('hashrate', (gpuId, hashrate) => mainWindow.webContents.send('hashrate', gpuId, hashrate))
-    TonPoolClient.on('reconnect', () => mainWindow.webContents.send('reconnect'))
-    TonPoolClient.on('stop', () => mainWindow.webContents.send('stop'))
-    TonPoolClient.on('submit', () => mainWindow.webContents.send('submit'))
-    TonPoolClient.on('submitDuplicate', () => mainWindow.webContents.send('submitDuplicate'))
-    TonPoolClient.on('submitInvalid', () => mainWindow.webContents.send('submitInvalid'))
-    TonPoolClient.on('submitStale', () => mainWindow.webContents.send('submitStale'))
+    TonPoolClient.on('connect', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('connect')
+            : undefined
+    )
+    TonPoolClient.on('error', (error) =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('error', error)
+            : undefined
+    )
+    TonPoolClient.on('hashrate', (gpuId, hashrate) =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('hashrate', gpuId, hashrate)
+            : undefined
+    )
+    TonPoolClient.on('reconnect', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('reconnect')
+            : undefined
+    )
+    TonPoolClient.on('stop', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('stop')
+            : undefined
+    )
+    TonPoolClient.on('submit', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('submit')
+            : undefined
+    )
+    TonPoolClient.on('submitDuplicate', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('submitDuplicate')
+            : undefined
+    )
+    TonPoolClient.on('submitInvalid', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('submitInvalid')
+            : undefined
+    )
+    TonPoolClient.on('submitStale', () =>
+        !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()
+            ? mainWindow.webContents.send('submitStale')
+            : undefined
+    )
 
     if (isDev) {
         mainWindow.webContents.openDevTools()
