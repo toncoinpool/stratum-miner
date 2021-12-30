@@ -65,7 +65,7 @@ class Miner extends EventEmitter {
     protected complexity = ''
     protected giver = ''
     protected gpu: GPU
-    protected iterations = '9223372036854775807'
+    protected iterations = '1000000000000'
     protected ref?: ChildProcess = undefined
     protected seed = ''
     protected solutionPath: string
