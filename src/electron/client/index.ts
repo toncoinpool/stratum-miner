@@ -122,7 +122,7 @@ class TonPoolClient extends EventEmitter {
             })
             .on('message', (message) => {
                 if ('method' in message && message.method === 'mining.set_target') {
-                    log.debug('new job received')
+                    log.debug('mining.set_target')
 
                     this.state = this.MINING
 
@@ -131,6 +131,7 @@ class TonPoolClient extends EventEmitter {
 
                 if ('method' in message && message.method === 'mining.notify') {
                     if (message.params[0] === 'expire') {
+                        log.debug('mining.notify.expire')
                         miners.forEach((miner) => miner.setExpire(message.params[1]))
                     }
                 }

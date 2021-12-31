@@ -5,6 +5,7 @@ import commandLineArgs from 'command-line-args'
 export interface ConfigJson {
     binary?: string
     boost?: string
+    debug?: boolean
     excludeGPUs?: string
     headless?: boolean
     integration?: string
@@ -27,7 +28,13 @@ const resourcePath =
         ? process.resourcesPath
         : resolve(__dirname, '..', '..')
 
+let config: Config | undefined
+
 export default function readConfig(): Config {
+    if (config) {
+        return config
+    }
+
     let jsonConfig: ConfigJson = {}
     try {
         const configPath = resolve(resourcePath, 'config', `config.json`)
@@ -40,11 +47,12 @@ export default function readConfig(): Config {
 
     const cliConfig = parseCliConfig()
 
-    const config: Config = {
+    config = {
         baseBinaryPath: resolve(resourcePath, 'bin'),
         binary: '',
         boost: '',
         dataDir: resolve(resourcePath, 'data'),
+        debug: false,
         excludeGPUs: '',
         headless: false,
         integration: '',
@@ -67,6 +75,7 @@ function parseCliConfig(): Partial<ConfigJson> {
         [
             { name: 'bin', alias: 'b' },
             { name: 'boost', alias: 'F' },
+            { name: 'debug', type: Boolean, defaultValue: false },
             { name: 'exclude-gpus' },
             { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
             { name: 'integration' },
@@ -86,6 +95,7 @@ function parseCliConfig(): Partial<ConfigJson> {
 
     if (args.bin) cliConfig.binary = args.bin as string
     if (args.boost) cliConfig.boost = args.boost as string
+    if ('debug' in args) cliConfig.debug = args.debug as boolean
     if (args['exclude-gpus']) cliConfig.excludeGPUs = args['exclude-gpus'] as string
     if ('headless' in args) cliConfig.headless = args.headless as boolean
     if (args.integration) cliConfig.integration = args.integration as string

@@ -3,6 +3,7 @@ import EventEmitter from 'events'
 import { platform } from 'os'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
+import log from './logger'
 import { GPU } from './read-gpus'
 
 interface MinedBody {
@@ -159,6 +160,8 @@ class Miner extends EventEmitter {
 
         const currentExpire = this.expired
 
+        log.debug(`[${this.id}] miner.run`)
+
         this.ref = execFile(
             this.gpu.minerPath,
             [
@@ -173,6 +176,8 @@ class Miner extends EventEmitter {
             ],
             { timeout: 0 },
             (error, stdout, stderr) => {
+                log.debug(`[${this.id}] miner.run done ${this.ref?.killed} ${error?.code} ${error?.signal}`)
+
                 const killed = this.ref?.killed
                 this.ref = undefined
 
