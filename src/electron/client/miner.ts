@@ -2,6 +2,7 @@ import { ChildProcess, execFile } from 'child_process'
 import EventEmitter from 'events'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
+import log from './logger'
 import { GPU } from './read-gpus'
 
 interface MinedBody {
@@ -65,17 +66,18 @@ class Miner extends EventEmitter {
     protected complexity = ''
     protected giver = ''
     protected gpu: GPU
-    protected iterations = '9223372036854775807'
+    protected iterations: string
     protected ref?: ChildProcess = undefined
     protected seed = ''
     protected solutionPath: string
     protected stopped = false
     protected wallet: string
 
-    constructor(gpu: GPU, wallet: string, dataDir: string) {
+    constructor(gpu: GPU, wallet: string, dataDir: string, iterations: string) {
         super()
         this.gpu = gpu
         this.id = gpu.id
+        this.iterations = iterations
         this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
         this.wallet = wallet
     }
@@ -157,6 +159,8 @@ class Miner extends EventEmitter {
 
         const currentExpire = this.expired
 
+        log.debug(`[${this.id}] miner.run`)
+
         this.ref = execFile(
             this.gpu.minerPath,
             [
@@ -171,8 +175,14 @@ class Miner extends EventEmitter {
             ],
             { timeout: 0 },
             (error, stdout, stderr) => {
+                log.debug(`[${this.id}] miner.run done ${this.ref?.killed} ${error?.code} ${error?.signal}`)
+
                 this.ref = undefined
 
+                // do not emit errors when closed manually on reconnect or shutdown
+                if (this.stopped) {
+                    return undefined
+                }
                 if (error && /expire_base [<>]=/.test(error.message)) {
                     // expire changed while were starting the miner
                     if (currentExpire !== this.expired) {
@@ -236,7 +246,11 @@ class Miner extends EventEmitter {
         this.stopped = false
     }
 
-    stop() {
+    stop(): void {
+        if (this.stopped) {
+            return undefined
+        }
+
         this.stopped = true
         this.ref?.kill()
     }

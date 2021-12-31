@@ -1,6 +1,8 @@
 import { createLogger, format, transports } from 'winston'
+import readConfig from './config'
 
 const { NODE_ENV } = process.env
+const { debug } = readConfig()
 
 /**
  * to log objects use string interpolation:
@@ -9,7 +11,7 @@ const { NODE_ENV } = process.env
  * ```
  */
 const log = createLogger({
-    level: NODE_ENV === 'development' ? 'debug' : 'info',
+    level: NODE_ENV === 'development' || !!debug ? 'debug' : 'info',
     format: format.combine(
         format.timestamp({ format: 'MMM DD HH:mm:ss' }),
         format.splat(),
