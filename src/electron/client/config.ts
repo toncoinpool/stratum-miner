@@ -59,7 +59,7 @@ export default function readConfig(): Config {
         iterations: '1000000000000',
         pool: 'wss://pplns.toncoinpool.io/stratum',
         rig: 'default',
-        version: '2.1.0',
+        version: '2.1.1',
         wallet: '',
         ...jsonConfig,
         ...cliConfig
