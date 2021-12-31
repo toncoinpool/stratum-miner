@@ -8,6 +8,7 @@ export interface ConfigJson {
     excludeGPUs?: string
     headless?: boolean
     integration?: string
+    iterations?: string
     pool?: string
     rig?: string
     wallet?: string
@@ -47,6 +48,7 @@ export default function readConfig(): Config {
         excludeGPUs: '',
         headless: false,
         integration: '',
+        iterations: '1000000000000',
         pool: 'wss://pplns.toncoinpool.io/stratum',
         rig: 'default',
         version: '2.1.0',
@@ -68,6 +70,7 @@ function parseCliConfig(): Partial<ConfigJson> {
             { name: 'exclude-gpus' },
             { name: 'headless', alias: 'h', type: Boolean, defaultValue: false },
             { name: 'integration' },
+            { name: 'iterations' },
             { name: 'pool', alias: 'p' },
             { name: 'rig', alias: 'r' },
             { name: 'wallet', alias: 'w' }
@@ -86,6 +89,7 @@ function parseCliConfig(): Partial<ConfigJson> {
     if (args['exclude-gpus']) cliConfig.excludeGPUs = args['exclude-gpus'] as string
     if ('headless' in args) cliConfig.headless = args.headless as boolean
     if (args.integration) cliConfig.integration = args.integration as string
+    if (args.iterations) cliConfig.iterations = args.iterations as string
     if (args.pool) cliConfig.pool = args.pool as string
     if (args.rig) cliConfig.rig = args.rig as string
     if (args.wallet) cliConfig.wallet = args.wallet as string

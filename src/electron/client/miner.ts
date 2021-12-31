@@ -66,17 +66,18 @@ class Miner extends EventEmitter {
     protected complexity = ''
     protected giver = ''
     protected gpu: GPU
-    protected iterations = '1000000000000'
+    protected iterations: string
     protected ref?: ChildProcess = undefined
     protected seed = ''
     protected solutionPath: string
     protected stopped = false
     protected wallet: string
 
-    constructor(gpu: GPU, wallet: string, dataDir: string) {
+    constructor(gpu: GPU, wallet: string, dataDir: string, iterations: string) {
         super()
         this.gpu = gpu
         this.id = gpu.id
+        this.iterations = iterations
         this.solutionPath = resolve(dataDir, `${this.id}-mined.boc`)
         this.wallet = wallet
     }

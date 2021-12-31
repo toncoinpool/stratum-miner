@@ -89,7 +89,7 @@ class TonPoolClient extends EventEmitter {
         }
 
         const miners = gpus.map((gpu) => {
-            const miner = new Miner(gpu, config.wallet, config.dataDir)
+            const miner = new Miner(gpu, config.wallet, config.dataDir, config.iterations)
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
             miner.on('hashrate', (hashrate) => this.emit('hashrate', miner.id, hashrate))
 
