@@ -53,6 +53,7 @@ class TonPoolClient extends EventEmitter {
         | TonPoolClient['MINING'] = this.DISCONNECTED
 
     private client?: Client
+    private miners: Miner[] = []
 
     constructor() {
         super()
@@ -88,13 +89,13 @@ class TonPoolClient extends EventEmitter {
             }
         }
 
-        const miners = gpus.map((gpu) => {
+        for (const gpu of gpus) {
             const miner = new Miner(gpu, config.wallet, config.dataDir, config.iterations)
             miner.on('error', ({ message }) => onError(new Error(`miner error: ${message}`)))
             miner.on('hashrate', (hashrate) => this.emit('hashrate', miner.id, hashrate))
 
-            return miner
-        })
+            this.miners.push(miner)
+        }
 
         log.info(`chosen pool is "${config.pool.replace('wss://', '')}"`)
 
@@ -102,20 +103,20 @@ class TonPoolClient extends EventEmitter {
         this.client = new Client(config.pool, config.wallet, config.rig, config.version)
             .on('close', (code, reason) => {
                 log.info(`connection closed with ${code} ${reason}`)
-                miners.forEach((miner) => miner.stop())
+                this.miners.forEach((miner) => miner.stop())
 
                 this.state = this.DISCONNECTED
                 this.emit('stop')
             })
             .on('complexity', (complexity) => {
-                miners.forEach((miner) => miner.setComplexity(complexity))
+                this.miners.forEach((miner) => miner.setComplexity(complexity))
             })
             .on('error', ({ message }) => onError(new Error(`connection error: ${message}`)))
             .on('open', () => {
                 reconnecting = false
                 log.info('connection established')
 
-                miners.forEach((miner) => miner.start())
+                this.miners.forEach((miner) => miner.start())
 
                 this.state = this.CONNECTED
                 this.emit('connect')
@@ -126,13 +127,13 @@ class TonPoolClient extends EventEmitter {
 
                     this.state = this.MINING
 
-                    miners.forEach((miner) => miner.setTarget(...message.params))
+                    this.miners.forEach((miner) => miner.setTarget(...message.params))
                 }
 
                 if ('method' in message && message.method === 'mining.notify') {
                     if (message.params[0] === 'expire') {
                         log.debug('mining.notify.expire')
-                        miners.forEach((miner) => miner.setExpire(message.params[1]))
+                        this.miners.forEach((miner) => miner.setExpire(message.params[1]))
                     }
                 }
             })
@@ -144,7 +145,7 @@ class TonPoolClient extends EventEmitter {
                     this.state = this.RECONNECTING
                     this.emit('reconnect')
 
-                    miners.forEach((miner) => miner.stop())
+                    this.miners.forEach((miner) => miner.stop())
                 }
             })
 
@@ -152,7 +153,7 @@ class TonPoolClient extends EventEmitter {
 
         this.state = this.CONNECTING
 
-        miners.forEach((miner) => {
+        this.miners.forEach((miner) => {
             miner.on('success', (solution) => {
                 this.client!.submit(solution).then(
                     () => {
@@ -182,12 +183,20 @@ class TonPoolClient extends EventEmitter {
     stop(): Promise<void> {
         log.info('stopping client...')
 
+        this.miners.forEach((miner) => miner.stop())
+
         if (!this.client || this.client.closed) {
             return Promise.resolve()
         }
 
         return Promise.all([new Promise<void>((resolve) => this.once('stop', resolve)), this.client.destroy()]).then(
-            () => undefined
+            () => {
+                for (const miner of this.miners) {
+                    miner.removeAllListeners()
+                }
+
+                this.miners = []
+            }
         )
     }
 }

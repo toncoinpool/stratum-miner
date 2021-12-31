@@ -1,6 +1,5 @@
 import { ChildProcess, execFile } from 'child_process'
 import EventEmitter from 'events'
-import { platform } from 'os'
 import { resolve } from 'path'
 import { BitString, Cell } from 'ton'
 import log from './logger'
@@ -178,12 +177,11 @@ class Miner extends EventEmitter {
             (error, stdout, stderr) => {
                 log.debug(`[${this.id}] miner.run done ${this.ref?.killed} ${error?.code} ${error?.signal}`)
 
-                const killed = this.ref?.killed
                 this.ref = undefined
 
-                // do not emit error when ref.kill is called on windows
-                if (killed && platform() === 'win32') {
-                    return this.run()
+                // do not emit errors when closed manually on reconnect or shutdown
+                if (this.stopped) {
+                    return undefined
                 }
                 if (error && /expire_base [<>]=/.test(error.message)) {
                     // expire changed while were starting the miner
@@ -248,7 +246,11 @@ class Miner extends EventEmitter {
         this.stopped = false
     }
 
-    stop() {
+    stop(): void {
+        if (this.stopped) {
+            return undefined
+        }
+
         this.stopped = true
         this.ref?.kill()
     }
