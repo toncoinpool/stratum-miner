@@ -127,6 +127,8 @@ class TonPoolClient extends EventEmitter {
 
                     this.state = this.MINING
 
+                    // set_target can come before 'open' event
+                    this.miners.forEach((miner) => miner.start())
                     this.miners.forEach((miner) => miner.setTarget(...message.params))
                 }
 
