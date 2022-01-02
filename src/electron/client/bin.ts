@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { writeFile } from 'fs'
 import { resolve } from 'path'
 import readConfig from './config'
@@ -64,6 +66,39 @@ void (async function main() {
         if (stat) stat.stale++
     })
 
+    const poolWallet = 'EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W'
+    let prevTimestamp = 0
+    let prevBalance = '0.0000'
+
+    const getBalance = () => {
+        fetch(`https://api.ton.sh/getTransactions?address=${poolWallet}`)
+            .then((res) => (res.status === 200 ? res.json() : { ok: false, error_code: res.status }))
+            .then((transaction) => {
+                if (!transaction.ok) return
+
+                const lastBlock = transaction.result[0]
+
+                // Check new block from POW giver
+                if (lastBlock.timestamp > prevTimestamp && lastBlock.received?.nanoton / 10 ** 9 === 100) {
+                    fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
+                        .then((res) => res.json())
+                        .then((miner) => {
+                            const balance = (miner.balance / 10 ** 9).toFixed(4)
+
+                            // Check new balance because of pool cache
+                            if (balance !== prevBalance) {
+                                prevTimestamp = lastBlock.timestamp
+                                prevBalance = balance
+
+                                log.info(`balance: ${balance}`)
+                            }
+                        })
+                        .catch((err) => log.error(`failed to get balance: ${err}`))
+                }
+            })
+            .catch((err) => log.error(`failed to get transactions: ${err}`))
+    }
+
     setInterval((): void => {
         if ([TonPoolClient.CONNECTED, TonPoolClient.MINING].includes(TonPoolClient.state) === false) {
             return undefined
@@ -79,6 +114,7 @@ void (async function main() {
         const rejected = values.reduce((acc, { duplicate, invalid, stale }) => acc + duplicate + invalid + stale, 0)
 
         log.info(`hs: ${hs} | shares: ${accepted}|${rejected}`)
+        getBalance()
     }, 1000 * 60).unref()
 
     if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
