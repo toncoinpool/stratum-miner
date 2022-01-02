@@ -12,9 +12,11 @@ Client                                Server
   |                                     |
   | --------- mining.subscribe -------> |
   | --------- mining.authorize -------> |
-  | <-------- mining.set_target ------- |
   |                                     |
-  | ---------- mining.submit ---------> |
+  | <-------- mining.set_target ------- |
+  | <---------- mining.notify --------- |
+  |                                     |
+  | ----------- mining.submit --------> |
 ```
 
 ## Supported methods
@@ -22,6 +24,7 @@ Client                                Server
 -   [mining.subscribe](#miningsubscribe)
 -   [mining.authorize](#miningauthorize)
 -   [mining.set_target](#miningset_target)
+-   [mining.notify](#miningnotify)
 -   [mining.submit](#miningsubmit)
 
 ## Errors
@@ -119,11 +122,30 @@ This method call will only be executed by the server
 -   [ `method` : `string` ]: RPC method name
 -   [ `params` : (`string`, `string`, `string`, `string`) ]: list of method parameters
     1.  Current giver's job seed
-    2.  "expired" parameter which is preffered by server to calculate job result
+    2.  "expired" parameter which is preferred by server to calculate job result
     3.  Current giver's address
     4.  Pool wallet address
 
 All job parameters must be used in .boc calculation, otherwise they will be rejected by pool
+
+## mining.notify
+
+Sometimes server may need to update `EXPIRED` parameter from `mining.set_target` even though giver's seed did not
+change. Currently `mining.notify` method is used just for that
+
+This method call will only be executed by the server
+
+### Request
+
+```json
+{ "id": null, "method": "mining.notify", "params": ["expire", "EXPIRED"] }
+```
+
+-   [ `id` : `int` ]: request id
+-   [ `method` : `string` ]: RPC method name
+-   [ `params` : (`string`, `string`) ]: list of method parameters
+    1.  always string `expire`
+    2.  "expired" parameter which is preferred by server to calculate job result
 
 ## mining.submit
 
