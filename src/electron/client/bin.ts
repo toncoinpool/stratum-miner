@@ -72,8 +72,10 @@ void (async function main() {
 
     const getBalance = () => {
         fetch(`https://api.ton.sh/getTransactions?address=${poolWallet}`)
-            .then((res) => res.json())
+            .then((res) => (res.status === 200 ? res.json() : { ok: false, error_code: res.status }))
             .then((transaction) => {
+                if (!transaction.ok) return
+
                 const lastBlock = transaction.result[0]
 
                 // Check new block from POW giver
