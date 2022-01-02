@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { writeFile } from 'fs'
 import { resolve } from 'path'
 import readConfig from './config'
@@ -64,22 +66,35 @@ void (async function main() {
         if (stat) stat.stale++
     })
 
-    let startTime = Date.now()
+    const poolWallet = 'EQCUp88072pLUGNQCXXXDFJM3C5v9GXTjV7ou33Mj3r0Xv2W'
+    let prevTimestamp = 0
     let prevBalance = '0.0000'
 
     const getBalance = () => {
-        fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
+        fetch(`https://api.ton.sh/getTransactions?address=${poolWallet}`)
             .then((res) => res.json())
-            .then((data) => {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                const balance = (data.balance / 10 ** 9).toFixed(4)
+            .then((transaction) => {
+                const lastBlock = transaction.result[0]
 
-                if (balance !== prevBalance) {
-                    prevBalance = balance
-                    log.info(`balance: ${balance}`)
+                // Check new block from POW giver
+                if (lastBlock.timestamp > prevTimestamp && lastBlock.received?.nanoton / 10 ** 9 === 100) {
+                    fetch(`https://pplns.toncoinpool.io/api/v1/public/miners/${config.wallet}`)
+                        .then((res) => res.json())
+                        .then((miner) => {
+                            const balance = (miner.balance / 10 ** 9).toFixed(4)
+
+                            // Check new balance because of pool cache
+                            if (balance !== prevBalance) {
+                                prevTimestamp = lastBlock.timestamp
+                                prevBalance = balance
+
+                                log.info(`balance: ${balance}`)
+                            }
+                        })
+                        .catch((err) => log.error(`failed to get balance: ${err}`))
                 }
             })
-            .catch((err) => log.error(`failed to get balance: ${err}`))
+            .catch((err) => log.error(`failed to get transactions: ${err}`))
     }
 
     setInterval((): void => {
@@ -97,11 +112,7 @@ void (async function main() {
         const rejected = values.reduce((acc, { duplicate, invalid, stale }) => acc + duplicate + invalid + stale, 0)
 
         log.info(`hs: ${hs} | shares: ${accepted}|${rejected}`)
-
-        if ((Date.now() - startTime) / 1000 >= 300 + Math.floor(Math.random() * 100)) {
-            startTime = Date.now()
-            getBalance()
-        }
+        getBalance()
     }, 1000 * 60).unref()
 
     if (['hiveos', 'msos', 'raveos'].includes(config.integration?.toLowerCase() || '')) {
